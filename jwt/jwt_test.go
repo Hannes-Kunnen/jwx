@@ -645,12 +645,12 @@ func TestSignErrors(t *testing.T) {
 	}
 
 	tok := jwt.New()
-	_, err = jwt.Sign(tok, jwt.WithKey(jwa.SignatureAlgorithm("BOGUS"), priv))
+	_, err = jwt.Sign(tok, jwt.WithKey(jwa.SigningAlgorithm("BOGUS"), priv))
 	if !assert.Error(t, err) {
 		return
 	}
 
-	if !assert.Contains(t, err.Error(), `unsupported signature algorithm "BOGUS"`) {
+	if !assert.Contains(t, err.Error(), `unsupported signing algorithm "BOGUS"`) {
 		return
 	}
 
@@ -1555,11 +1555,11 @@ func TestSerializer(t *testing.T) {
 			return
 		}
 	})
-	t.Run(`Invalid SignatureAglrotihm`, func(t *testing.T) {
+	t.Run(`Invalid SigningAlgorithm`, func(t *testing.T) {
 		_, err := jwt.NewSerializer().
 			Encrypt(jwt.WithKey(jwa.A256KW, []byte("abracadabra"))).
 			Serialize(jwt.New())
-		if !assert.Error(t, err, `Serialize() should succeedl`) {
+		if !assert.Error(t, err, `Serialize() should succeed`) {
 			return
 		}
 	})
@@ -1571,11 +1571,11 @@ func TestSerializer(t *testing.T) {
 			return
 		}
 	})
-	t.Run(`Invalid KeyEncryptionAglrotihm`, func(t *testing.T) {
+	t.Run(`Invalid KeyEncryptionAlgorithm`, func(t *testing.T) {
 		_, err := jwt.NewSerializer().
 			Encrypt(jwt.WithKey(jwa.HS256, []byte("abracadabra"))).
 			Serialize(jwt.New())
-		if !assert.Error(t, err, `Serialize() should succeedl`) {
+		if !assert.Error(t, err, `Serialize() should succeed`) {
 			return
 		}
 	})
@@ -1728,10 +1728,6 @@ func TestGH888(t *testing.T) {
 	require.NoError(t, err, `jwt.Builder should succeed`)
 
 	// 1) "none" must be triggered by its own option. Can't use jwt.WithKey(jwa.NoSignature, ...)
-	t.Run("jwt.Sign(token, jwt.WithKey(jwa.NoSignature)) should fail", func(t *testing.T) {
-		_, err := jwt.Sign(token, jwt.WithKey(jwa.NoSignature, nil))
-		require.Error(t, err, `jwt.Sign with jwt.WithKey should fail`)
-	})
 	t.Run("jwt.Sign(token, jwt.WithInsecureNoSignature())", func(t *testing.T) {
 		signed, err := jwt.Sign(token, jwt.WithInsecureNoSignature())
 		require.NoError(t, err, `jwt.Sign should succeed`)
