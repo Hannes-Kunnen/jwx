@@ -226,7 +226,7 @@ func (h *symmetricKey) setNoLock(name string, value interface{}) error {
 		return nil
 	case AlgorithmKey:
 		switch v := value.(type) {
-		case string, jwa.SignatureAlgorithm, jwa.ContentEncryptionAlgorithm:
+		case string, jwa.SigningAlgorithm, jwa.ContentEncryptionAlgorithm:
 			var tmp = jwa.KeyAlgorithmFrom(v)
 			h.algorithm = &tmp
 		case fmt.Stringer:

@@ -108,12 +108,10 @@ type Key interface {
 	KeyUsage() string
 	// KeyOps returns `key_ops` of a JWK
 	KeyOps() KeyOperationList
-	// Algorithm returns `alg` of a JWK
-
 	// Algorithm returns the value of the `alg` field
 	//
-	// This field may contain either `jwk.SignatureAlgorithm` or `jwk.KeyEncryptionAlgorithm`.
-	// This is why there exists a `jwa.KeyAlgorithm` type that encompases both types.
+	// This field may contain either `jwa.SigningAlgorithm` or `jwa.KeyEncryptionAlgorithm`.
+	// This is why there exists a `jwa.KeyAlgorithm` type that encompasses both types.
 	Algorithm() jwa.KeyAlgorithm
 	// KeyID returns `kid` of a JWK
 	KeyID() string
