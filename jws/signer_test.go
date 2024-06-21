@@ -14,7 +14,7 @@ func TestSign(t *testing.T) {
 	t.Parallel()
 	t.Run("Bad algorithm", func(t *testing.T) {
 		t.Parallel()
-		_, err := jws.Sign([]byte(nil), jws.WithKey(jwa.SignatureAlgorithm("FooBar"), nil))
+		_, err := jws.Sign([]byte(nil), jws.WithKey(jwa.SigningAlgorithm("FooBar"), nil))
 		if !assert.Error(t, err, "Unknown algorithm should return error") {
 			return
 		}

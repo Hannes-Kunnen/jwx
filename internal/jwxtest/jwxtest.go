@@ -314,7 +314,7 @@ func EncryptJweFile(ctx context.Context, payload []byte, keyalg jwa.KeyEncryptio
 	return WriteFile("jwx-test-*.jwe", bytes.NewReader(buf))
 }
 
-func VerifyJwsFile(ctx context.Context, file string, alg jwa.SignatureAlgorithm, jwkfile string) ([]byte, error) {
+func VerifyJwsFile(ctx context.Context, file string, alg jwa.SigningAlgorithm, jwkfile string) ([]byte, error) {
 	key, err := ParseJwkFile(ctx, jwkfile)
 	if err != nil {
 		return nil, fmt.Errorf(`failed to parse keyfile %s: %w`, file, err)
@@ -342,7 +342,7 @@ func VerifyJwsFile(ctx context.Context, file string, alg jwa.SignatureAlgorithm,
 	return jws.Verify(buf, jws.WithKey(alg, pubkey))
 }
 
-func SignJwsFile(ctx context.Context, payload []byte, alg jwa.SignatureAlgorithm, keyfile string) (string, func(), error) {
+func SignJwsFile(ctx context.Context, payload []byte, alg jwa.SigningAlgorithm, keyfile string) (string, func(), error) {
 	key, err := ParseJwkFile(ctx, keyfile)
 	if err != nil {
 		return "", nil, fmt.Errorf(`failed to parse keyfile %s: %w`, keyfile, err)

@@ -10,11 +10,11 @@ import (
 	"github.com/lestrrat-go/jwx/v2/jwa"
 )
 
-var rsaSigners map[jwa.SignatureAlgorithm]*rsaSigner
-var rsaVerifiers map[jwa.SignatureAlgorithm]*rsaVerifier
+var rsaSigners map[jwa.SigningAlgorithm]*rsaSigner
+var rsaVerifiers map[jwa.SigningAlgorithm]*rsaVerifier
 
 func init() {
-	algs := map[jwa.SignatureAlgorithm]struct {
+	algs := map[jwa.SigningAlgorithm]struct {
 		Hash crypto.Hash
 		PSS  bool
 	}{
@@ -41,8 +41,8 @@ func init() {
 		},
 	}
 
-	rsaSigners = make(map[jwa.SignatureAlgorithm]*rsaSigner)
-	rsaVerifiers = make(map[jwa.SignatureAlgorithm]*rsaVerifier)
+	rsaSigners = make(map[jwa.SigningAlgorithm]*rsaSigner)
+	rsaVerifiers = make(map[jwa.SigningAlgorithm]*rsaVerifier)
 	for alg, item := range algs {
 		rsaSigners[alg] = &rsaSigner{
 			alg:  alg,
@@ -58,12 +58,12 @@ func init() {
 }
 
 type rsaSigner struct {
-	alg  jwa.SignatureAlgorithm
+	alg  jwa.SigningAlgorithm
 	hash crypto.Hash
 	pss  bool
 }
 
-func newRSASigner(alg jwa.SignatureAlgorithm) Signer {
+func newRSASigner(alg jwa.SigningAlgorithm) Signer {
 	return rsaSigners[alg]
 }
 
@@ -103,12 +103,12 @@ func (rs *rsaSigner) Sign(payload []byte, key interface{}) ([]byte, error) {
 }
 
 type rsaVerifier struct {
-	alg  jwa.SignatureAlgorithm
+	alg  jwa.SigningAlgorithm
 	hash crypto.Hash
 	pss  bool
 }
 
-func newRSAVerifier(alg jwa.SignatureAlgorithm) Verifier {
+func newRSAVerifier(alg jwa.SigningAlgorithm) Verifier {
 	return rsaVerifiers[alg]
 }
 

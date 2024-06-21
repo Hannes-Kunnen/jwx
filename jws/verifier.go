@@ -17,7 +17,7 @@ func (fn VerifierFactoryFn) Create() (Verifier, error) {
 }
 
 var muVerifierDB sync.RWMutex
-var verifierDB map[jwa.SignatureAlgorithm]VerifierFactory
+var verifierDB map[jwa.SigningAlgorithm]VerifierFactory
 
 // RegisterVerifier is used to register a factory object that creates
 // Verifier objects based on the given algorithm.
@@ -27,10 +27,10 @@ var verifierDB map[jwa.SignatureAlgorithm]VerifierFactory
 // (probably in your `init()`)
 //
 // Unlike the `UnregisterVerifier` function, this function automatically
-// calls `jwa.RegisterSignatureAlgorithm` to register the algorithm
-// in the known algorithms database.
-func RegisterVerifier(alg jwa.SignatureAlgorithm, f VerifierFactory) {
-	jwa.RegisterSignatureAlgorithm(alg)
+// calls `jwa.RegisterSigningAlgorithm` to register the algorithm
+// in the known-algorithms database.
+func RegisterVerifier(alg jwa.SigningAlgorithm, f VerifierFactory) {
+	jwa.RegisterSigningAlgorithm(alg)
 	muVerifierDB.Lock()
 	verifierDB[alg] = f
 	muVerifierDB.Unlock()
@@ -44,34 +44,34 @@ func RegisterVerifier(alg jwa.SignatureAlgorithm, f VerifierFactory) {
 // This is because the algorithm may still be required for signing or
 // some other operation (however unlikely, it is still possible).
 // Therefore, in order to completely remove the algorithm, you must
-// call `jwa.UnregisterSignatureAlgorithm` yourself.
-func UnregisterVerifier(alg jwa.SignatureAlgorithm) {
+// call `jwa.UnregisterSigningAlgorithm` yourself.
+func UnregisterVerifier(alg jwa.SigningAlgorithm) {
 	muVerifierDB.Lock()
 	delete(verifierDB, alg)
 	muVerifierDB.Unlock()
 }
 
 func init() {
-	verifierDB = make(map[jwa.SignatureAlgorithm]VerifierFactory)
+	verifierDB = make(map[jwa.SigningAlgorithm]VerifierFactory)
 
-	for _, alg := range []jwa.SignatureAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512} {
-		RegisterVerifier(alg, func(alg jwa.SignatureAlgorithm) VerifierFactory {
+	for _, alg := range []jwa.SigningAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512} {
+		RegisterVerifier(alg, func(alg jwa.SigningAlgorithm) VerifierFactory {
 			return VerifierFactoryFn(func() (Verifier, error) {
 				return newRSAVerifier(alg), nil
 			})
 		}(alg))
 	}
 
-	for _, alg := range []jwa.SignatureAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512, jwa.ES256K} {
-		RegisterVerifier(alg, func(alg jwa.SignatureAlgorithm) VerifierFactory {
+	for _, alg := range []jwa.SigningAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512, jwa.ES256K} {
+		RegisterVerifier(alg, func(alg jwa.SigningAlgorithm) VerifierFactory {
 			return VerifierFactoryFn(func() (Verifier, error) {
 				return newECDSAVerifier(alg), nil
 			})
 		}(alg))
 	}
 
-	for _, alg := range []jwa.SignatureAlgorithm{jwa.HS256, jwa.HS384, jwa.HS512} {
-		RegisterVerifier(alg, func(alg jwa.SignatureAlgorithm) VerifierFactory {
+	for _, alg := range []jwa.SigningAlgorithm{jwa.HS256, jwa.HS384, jwa.HS512} {
+		RegisterVerifier(alg, func(alg jwa.SigningAlgorithm) VerifierFactory {
 			return VerifierFactoryFn(func() (Verifier, error) {
 				return newHMACVerifier(alg), nil
 			})
@@ -84,7 +84,7 @@ func init() {
 }
 
 // NewVerifier creates a verifier that signs payloads using the given signature algorithm.
-func NewVerifier(alg jwa.SignatureAlgorithm) (Verifier, error) {
+func NewVerifier(alg jwa.SigningAlgorithm) (Verifier, error) {
 	muVerifierDB.RLock()
 	f, ok := verifierDB[alg]
 	muVerifierDB.RUnlock()
@@ -92,5 +92,5 @@ func NewVerifier(alg jwa.SignatureAlgorithm) (Verifier, error) {
 	if ok {
 		return f.Create()
 	}
-	return nil, fmt.Errorf(`unsupported signature algorithm "%s"`, alg)
+	return nil, fmt.Errorf(`unsupported signing algorithm "%s"`, alg)
 }

@@ -463,10 +463,6 @@ func (t typ) Generate() error {
 	o.LL("func init() {")
 	o.L("mu%[1]ss.Lock()", t.name)
 	o.L("defer mu%[1]ss.Unlock()", t.name)
-	if t.name == "SigningAlgorithm" {
-		o.L("mu%[1]ss.Lock()", "SignatureAlgorithm")
-		o.L("defer mu%[1]ss.Unlock()", "SignatureAlgorithm")
-	}
 	o.L("all%[1]ss = make(map[%[1]s]struct{})", t.name)
 	for _, e := range t.elements {
 		if !e.invalid {
@@ -474,9 +470,6 @@ func (t typ) Generate() error {
 		}
 	}
 	o.L("rebuild%[1]s()", t.name)
-	if t.name == "SigningAlgorithm" {
-		o.L("rebuild%[1]s()", "SignatureAlgorithm")
-	}
 	o.L("}")
 
 	o.LL("// Register%[1]s registers a new %[1]s so that the jwx can properly handle the new value.", t.name)
@@ -495,6 +488,7 @@ func (t typ) Generate() error {
 	o.L("all%[1]ss[v] = struct{}{}", t.name)
 	o.L("rebuild%[1]s()", t.name)
 	if t.name == "SigningAlgorithm" {
+		o.L("all%[1]ss[v] = struct{}{}", "SignatureAlgorithm")
 		o.L("rebuild%[1]s()", "SignatureAlgorithm")
 	}
 	o.L("}")
@@ -516,6 +510,7 @@ func (t typ) Generate() error {
 	o.L("delete(all%[1]ss, v)", t.name)
 	o.L("rebuild%[1]s()", t.name)
 	if t.name == "SigningAlgorithm" {
+		o.L("delete(all%[1]ss, v)", "SignatureAlgorithm")
 		o.L("rebuild%[1]s()", "SignatureAlgorithm")
 	}
 	o.L("}")

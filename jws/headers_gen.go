@@ -89,7 +89,7 @@ func (h *stdHeaders) Algorithm() jwa.SignatureAlgorithm {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
 	if h.algorithm == nil {
-		return ""
+		return nil
 	}
 	return *(h.algorithm)
 }
@@ -333,8 +333,8 @@ func (h *stdHeaders) Set(name string, value interface{}) error {
 func (h *stdHeaders) setNoLock(name string, value interface{}) error {
 	switch name {
 	case AlgorithmKey:
-		var acceptor jwa.SignatureAlgorithm
-		if err := acceptor.Accept(value); err != nil {
+		acceptor, err := jwa.SignatureAlgorithmAccept(value)
+		if err != nil {
 			return fmt.Errorf(`invalid value for %s key: %w`, AlgorithmKey, err)
 		}
 		h.algorithm = &acceptor
@@ -463,11 +463,15 @@ LOOP:
 		case string: // Objects can only have string keys
 			switch tok {
 			case AlgorithmKey:
-				var decoded jwa.SignatureAlgorithm
+				var decoded string
 				if err := dec.Decode(&decoded); err != nil {
 					return fmt.Errorf(`failed to decode value for key %s: %w`, AlgorithmKey, err)
 				}
-				h.algorithm = &decoded
+				signatureAlgorithm, err := jwa.SignatureAlgorithmAccept(decoded)
+				if err != nil {
+					return err
+				}
+				h.algorithm = &signatureAlgorithm
 			case ContentTypeKey:
 				if err := json.AssignNextStringToken(&h.contentType, dec); err != nil {
 					return fmt.Errorf(`failed to decode value for key %s: %w`, ContentTypeKey, err)

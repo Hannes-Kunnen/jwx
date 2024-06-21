@@ -11,7 +11,7 @@
 //
 // To sign, simply use `jws.Sign`. `payload` is a []byte buffer that
 // contains whatever data you want to sign. `alg` is one of the
-// jwa.SignatureAlgorithm constants from package jwa. For RSA and
+// jwa.SigningAlgorithm constants from package jwa. For RSA and
 // ECDSA family of algorithms, you will need to prepare a private key.
 // For HMAC family, you just need a []byte value. The `jws.Sign`
 // function will return the encoded JWS message on success.
@@ -71,16 +71,16 @@ func (s *payloadSigner) PublicHeader() Headers {
 	return s.public
 }
 
-var signers = make(map[jwa.SignatureAlgorithm]Signer)
+var signers = make(map[jwa.SigningAlgorithm]Signer)
 var muSigner = &sync.Mutex{}
 
-func removeSigner(alg jwa.SignatureAlgorithm) {
+func removeSigner(alg jwa.SigningAlgorithm) {
 	muSigner.Lock()
 	defer muSigner.Unlock()
 	delete(signers, alg)
 }
 
-func makeSigner(alg jwa.SignatureAlgorithm, key interface{}, public, protected Headers) (*payloadSigner, error) {
+func makeSigner(alg jwa.SigningAlgorithm, key interface{}, public, protected Headers) (*payloadSigner, error) {
 	muSigner.Lock()
 	signer, ok := signers[alg]
 	if !ok {
@@ -184,14 +184,9 @@ func Sign(payload []byte, options ...SignOption) ([]byte, error) {
 		case identKey{}:
 			data := option.Value().(*withKey)
 
-			alg, ok := data.alg.(jwa.SignatureAlgorithm)
+			alg, ok := data.alg.(jwa.SigningAlgorithm)
 			if !ok {
-				return nil, fmt.Errorf(`jws.Sign: expected algorithm to be of type jwa.SignatureAlgorithm but got (%[1]q, %[1]T)`, data.alg)
-			}
-
-			// No, we don't accept "none" here.
-			if alg == jwa.NoSignature {
-				return nil, fmt.Errorf(`jws.Sign: "none" (jwa.NoSignature) cannot be used with jws.WithKey`)
+				return nil, fmt.Errorf(`jws.Sign: expected algorithm to be of type jwa.SigningAlgorithm but got (%[1]q, %[1]T)`, data.alg)
 			}
 
 			signer, err := makeSigner(alg, data.key, data.public, data.protected)
@@ -309,8 +304,8 @@ var allowNoneWhitelist = jwk.WhitelistFunc(func(string) bool {
 //
 // Because the use of "none" (jwa.NoSignature) algorithm is strongly discouraged,
 // this function DOES NOT consider it a success when `{"alg":"none"}` is
-// encountered in the message (it would also be counter intuitive when the code says
-// you _verified_ something when in fact it did no such thing). If you want to
+// encountered in the message (it would also be counterintuitive when the code says
+// it _verified_ something when in fact it did no such thing). If you want to
 // accept messages with "none" signature algorithm, use `jws.Parse` to get the
 // raw JWS message.
 func Verify(buf []byte, options ...VerifyOption) ([]byte, error) {
@@ -332,9 +327,9 @@ func Verify(buf []byte, options ...VerifyOption) ([]byte, error) {
 			detachedPayload = option.Value().([]byte)
 		case identKey{}:
 			pair := option.Value().(*withKey)
-			alg, ok := pair.alg.(jwa.SignatureAlgorithm)
+			alg, ok := pair.alg.(jwa.SigningAlgorithm)
 			if !ok {
-				return nil, fmt.Errorf(`WithKey() option must be specified using jwa.SignatureAlgorithm (got %T)`, pair.alg)
+				return nil, fmt.Errorf(`WithKey() option must be specified using jwa.SigningAlgorithm (got %T)`, pair.alg)
 			}
 			keyProviders = append(keyProviders, &staticKeyProvider{
 				alg: alg,
@@ -417,9 +412,9 @@ func Verify(buf []byte, options ...VerifyOption) ([]byte, error) {
 			for _, pair := range sink.list {
 				// alg is converted here because pair.alg is of type jwa.KeyAlgorithm.
 				// this may seem ugly, but we're trying to avoid declaring separate
-				// structs for `alg jwa.KeyAlgorithm` and `alg jwa.SignatureAlgorithm`
+				// structs for `alg jwa.KeyEncryptionAlgorithm` and `alg jwa.SigningAlgorithm`
 				//nolint:forcetypeassert
-				alg := pair.alg.(jwa.SignatureAlgorithm)
+				alg := pair.alg.(jwa.SigningAlgorithm)
 				key := pair.key
 
 				if validateKey {
@@ -799,7 +794,7 @@ func RegisterCustomField(name string, object interface{}) {
 
 // Helpers for signature verification
 var rawKeyToKeyType = make(map[reflect.Type]jwa.KeyType)
-var keyTypeToAlgorithms = make(map[jwa.KeyType][]jwa.SignatureAlgorithm)
+var keyTypeToAlgorithms = make(map[jwa.KeyType][]jwa.SigningAlgorithm)
 
 func init() {
 	rawKeyToKeyType[reflect.TypeOf([]byte(nil))] = jwa.OctetSeq
@@ -810,18 +805,18 @@ func init() {
 	rawKeyToKeyType[reflect.TypeOf((*ecdsa.PublicKey)(nil))] = jwa.EC
 
 	addAlgorithmForKeyType(jwa.OKP, jwa.EdDSA)
-	for _, alg := range []jwa.SignatureAlgorithm{jwa.HS256, jwa.HS384, jwa.HS512} {
+	for _, alg := range []jwa.SigningAlgorithm{jwa.HS256, jwa.HS384, jwa.HS512} {
 		addAlgorithmForKeyType(jwa.OctetSeq, alg)
 	}
-	for _, alg := range []jwa.SignatureAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512} {
+	for _, alg := range []jwa.SigningAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512} {
 		addAlgorithmForKeyType(jwa.RSA, alg)
 	}
-	for _, alg := range []jwa.SignatureAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512} {
+	for _, alg := range []jwa.SigningAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512} {
 		addAlgorithmForKeyType(jwa.EC, alg)
 	}
 }
 
-func addAlgorithmForKeyType(kty jwa.KeyType, alg jwa.SignatureAlgorithm) {
+func addAlgorithmForKeyType(kty jwa.KeyType, alg jwa.SigningAlgorithm) {
 	keyTypeToAlgorithms[kty] = append(keyTypeToAlgorithms[kty], alg)
 }
 
@@ -829,7 +824,7 @@ func addAlgorithmForKeyType(kty jwa.KeyType, alg jwa.SignatureAlgorithm) {
 // be used for a given key. It only takes in consideration keys/algorithms
 // for verification purposes, as this is the only usage where one may need
 // dynamically figure out which method to use.
-func AlgorithmsForKey(key interface{}) ([]jwa.SignatureAlgorithm, error) {
+func AlgorithmsForKey(key interface{}) ([]jwa.SigningAlgorithm, error) {
 	var kty jwa.KeyType
 	switch key := key.(type) {
 	case jwk.Key:

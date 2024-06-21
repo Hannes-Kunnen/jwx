@@ -3,6 +3,7 @@ fields:
     type: jwa.SignatureAlgorithm
     json: alg
     hasAccept: true
+    customAccept: jwa.SignatureAlgorithmAccept
     comment: https://tools.ietf.org/html/rfc7515#section-4.1.1
   - name: jwkSetURL
     unexported_name: jwkSetURL

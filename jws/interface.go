@@ -86,7 +86,7 @@ type hmacSignFunc func([]byte, []byte) ([]byte, error)
 
 // HMACSigner uses crypto/hmac to sign the payloads.
 type HMACSigner struct {
-	alg  jwa.SignatureAlgorithm
+	alg  jwa.SigningAlgorithm
 	sign hmacSignFunc
 }
 

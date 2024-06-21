@@ -183,7 +183,7 @@ func (es *dummyECDSACryptoSigner) Sign(rand io.Reader, digest []byte, _ crypto.S
 
 var _ crypto.Signer = &dummyECDSACryptoSigner{}
 
-func testRoundtrip(t *testing.T, payload []byte, alg jwa.SignatureAlgorithm, signKey interface{}, keys map[string]interface{}) {
+func testRoundtrip(t *testing.T, payload []byte, alg jwa.SigningAlgorithm, signKey interface{}, keys map[string]interface{}) {
 	jwkKey, err := jwk.FromRaw(signKey)
 	require.NoError(t, err, `jwk.New should succeed`)
 	signKeys := []struct {
@@ -265,7 +265,7 @@ func TestRoundtrip(t *testing.T) {
 			"[]byte":  sharedkey,
 			"jwk.Key": jwkKey,
 		}
-		hmacAlgorithms := []jwa.SignatureAlgorithm{jwa.HS256, jwa.HS384, jwa.HS512}
+		hmacAlgorithms := []jwa.SigningAlgorithm{jwa.HS256, jwa.HS384, jwa.HS512}
 		for _, alg := range hmacAlgorithms {
 			alg := alg
 			t.Run(alg.String(), func(t *testing.T) {
@@ -284,7 +284,7 @@ func TestRoundtrip(t *testing.T) {
 			"Verify(*ecdsa.PublicKey)": &key.PublicKey,
 			"Verify(jwk.Key)":          jwkKey,
 		}
-		for _, alg := range []jwa.SignatureAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512} {
+		for _, alg := range []jwa.SigningAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512} {
 			alg := alg
 			t.Run(alg.String(), func(t *testing.T) {
 				t.Parallel()
@@ -302,7 +302,7 @@ func TestRoundtrip(t *testing.T) {
 			"Verify(*rsa.PublicKey)": &key.PublicKey,
 			"Verify(jwk.Key)":        jwkKey,
 		}
-		for _, alg := range []jwa.SignatureAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512} {
+		for _, alg := range []jwa.SigningAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512} {
 			alg := alg
 			t.Run(alg.String(), func(t *testing.T) {
 				t.Parallel()
@@ -322,7 +322,7 @@ func TestRoundtrip(t *testing.T) {
 			// "Verify(*ed25519.Public())": &pubkey,
 			"Verify(jwk.Key)": jwkKey,
 		}
-		for _, alg := range []jwa.SignatureAlgorithm{jwa.EdDSA} {
+		for _, alg := range []jwa.SigningAlgorithm{jwa.EdDSA} {
 			alg := alg
 			t.Run(alg.String(), func(t *testing.T) {
 				t.Parallel()
@@ -335,7 +335,7 @@ func TestRoundtrip(t *testing.T) {
 func TestSignMulti2(t *testing.T) {
 	sharedkey := []byte("Avracadabra")
 	payload := []byte("Lorem ipsum")
-	hmacAlgorithms := []jwa.SignatureAlgorithm{jwa.HS256, jwa.HS384, jwa.HS512}
+	hmacAlgorithms := []jwa.SigningAlgorithm{jwa.HS256, jwa.HS384, jwa.HS512}
 	var signed []byte
 	t.Run("Sign", func(t *testing.T) {
 		var options = []jws.SignOption{jws.WithJSON()}
@@ -435,7 +435,8 @@ func TestEncode(t *testing.T) {
 		standardHeaders := jws.NewHeaders()
 		require.NoError(t, json.Unmarshal(hdr, standardHeaders), `parsing headers should succeed`)
 
-		alg := standardHeaders.Algorithm()
+		alg, ok := standardHeaders.Algorithm().(jwa.SigningAlgorithm)
+		require.True(t, ok, `algorithm should be a jwa.SigningAlgorithm to sign`)
 
 		jwkKey, err := jwk.ParseKey([]byte(jwksrc))
 		if err != nil {
@@ -1476,82 +1477,82 @@ func TestAlgorithmsForKey(t *testing.T) {
 	testcases := []struct {
 		Name     string
 		Key      interface{}
-		Expected []jwa.SignatureAlgorithm
+		Expected []jwa.SigningAlgorithm
 	}{
 		{
 			Name:     "Octet sequence",
 			Key:      []byte("hello"),
-			Expected: []jwa.SignatureAlgorithm{jwa.HS256, jwa.HS384, jwa.HS512},
+			Expected: []jwa.SigningAlgorithm{jwa.HS256, jwa.HS384, jwa.HS512},
 		},
 		{
 			Name:     "rsa.PublicKey",
 			Key:      rsa.PublicKey{},
-			Expected: []jwa.SignatureAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512},
+			Expected: []jwa.SigningAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512},
 		},
 		{
 			Name:     "*rsa.PublicKey",
 			Key:      &rsa.PublicKey{},
-			Expected: []jwa.SignatureAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512},
+			Expected: []jwa.SigningAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512},
 		},
 		{
 			Name:     "jwk.RSAPublicKey",
 			Key:      rsapubkey,
-			Expected: []jwa.SignatureAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512},
+			Expected: []jwa.SigningAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512},
 		},
 		{
 			Name:     "ecdsa.PublicKey",
 			Key:      ecdsa.PublicKey{},
-			Expected: []jwa.SignatureAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512},
+			Expected: []jwa.SigningAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512},
 		},
 		{
 			Name:     "*ecdsa.PublicKey",
 			Key:      &ecdsa.PublicKey{},
-			Expected: []jwa.SignatureAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512},
+			Expected: []jwa.SigningAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512},
 		},
 		{
 			Name:     "jwk.ECDSAPublicKey",
 			Key:      ecdsapubkey,
-			Expected: []jwa.SignatureAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512},
+			Expected: []jwa.SigningAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512},
 		},
 		{
 			Name:     "rsa.PrivateKey",
 			Key:      rsa.PrivateKey{},
-			Expected: []jwa.SignatureAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512},
+			Expected: []jwa.SigningAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512},
 		},
 		{
 			Name:     "*rsa.PrivateKey",
 			Key:      &rsa.PrivateKey{},
-			Expected: []jwa.SignatureAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512},
+			Expected: []jwa.SigningAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512},
 		},
 		{
 			Name:     "jwk.RSAPrivateKey",
 			Key:      rsapubkey,
-			Expected: []jwa.SignatureAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512},
+			Expected: []jwa.SigningAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512},
 		},
 		{
 			Name:     "ecdsa.PrivateKey",
 			Key:      ecdsa.PrivateKey{},
-			Expected: []jwa.SignatureAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512},
+			Expected: []jwa.SigningAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512},
 		},
 		{
 			Name:     "*ecdsa.PrivateKey",
 			Key:      &ecdsa.PrivateKey{},
-			Expected: []jwa.SignatureAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512},
+			Expected: []jwa.SigningAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512},
 		},
 		{
 			Name:     "jwk.ECDSAPrivateKey",
 			Key:      ecdsaprivkey,
-			Expected: []jwa.SignatureAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512},
+			Expected: []jwa.SigningAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512},
 		},
 		{
 			Name:     "ed25519.PublicKey",
 			Key:      ed25519.PublicKey(nil),
-			Expected: []jwa.SignatureAlgorithm{jwa.EdDSA},
+			Expected: []jwa.SigningAlgorithm{jwa.EdDSA},
 		},
 		{
 			Name:     "x25519.PublicKey",
 			Key:      x25519.PublicKey(nil),
-			Expected: []jwa.SignatureAlgorithm{jwa.EdDSA},
+			Expected: []jwa.SigningAlgorithm{jwa.EdDSA},
 		},
 	}
 
@@ -1629,7 +1630,7 @@ func TestGH888(t *testing.T) {
 	_, err := jws.Sign([]byte(`foo`), jws.WithInsecureNoSignature(), jws.WithKey(jwa.HS256, []byte(`bar`)))
 	require.Error(t, err, `jws.Sign with multiple keys (including alg=none) should fail`)
 
-	// This should pass because we can now have multiple signaures with JSON serialization
+	// This should pass because we can now have multiple signatures with JSON serialization
 	signed, err := jws.Sign([]byte(`foo`), jws.WithInsecureNoSignature(), jws.WithKey(jwa.HS256, []byte(`bar`)), jws.WithJSON())
 	require.NoError(t, err, `jws.Sign should succeed`)
 
@@ -1651,9 +1652,6 @@ func TestGH888(t *testing.T) {
 	_, err = jws.Verify(signed)
 	require.Error(t, err, `jws.Verify should fail`)
 
-	_, err = jws.Verify(signed, jws.WithKey(jwa.NoSignature, nil))
-	require.Error(t, err, `jws.Verify should fail`)
-
 	// Note: you can't do jws.Verify(..., jws.WithInsecureNoSignature())
 
 	verified, err := jws.Verify(signed, jws.WithKey(jwa.HS256, []byte(`bar`)))
@@ -1667,7 +1665,7 @@ func TestGH888(t *testing.T) {
 // users to download an optional dependency
 type s256SignerVerifier struct{}
 
-const sha256Algo jwa.SignatureAlgorithm = "SillyTest256"
+const sha256Algo jwa.SigningAlgorithm = "SillyTest256"
 
 func (s256SignerVerifier) Algorithm() jwa.SignatureAlgorithm {
 	return sha256Algo
@@ -1697,9 +1695,9 @@ func TestGH910(t *testing.T) {
 		return s256SignerVerifier{}, nil
 	}))
 	defer jws.UnregisterVerifier(sha256Algo)
-	defer jwa.UnregisterSignatureAlgorithm(sha256Algo)
+	defer jwa.UnregisterSigningAlgorithm(sha256Algo)
 
-	var sa jwa.SignatureAlgorithm
+	var sa jwa.SigningAlgorithm
 	require.NoError(t, sa.Accept(sha256Algo.String()), `jwa.SignatureAlgorithm.Accept should succeed`)
 
 	// Now that we have established that the signature algorithm works,

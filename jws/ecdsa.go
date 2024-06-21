@@ -14,18 +14,18 @@ import (
 	"github.com/lestrrat-go/jwx/v2/jwa"
 )
 
-var ecdsaSigners map[jwa.SignatureAlgorithm]*ecdsaSigner
-var ecdsaVerifiers map[jwa.SignatureAlgorithm]*ecdsaVerifier
+var ecdsaSigners map[jwa.SigningAlgorithm]*ecdsaSigner
+var ecdsaVerifiers map[jwa.SigningAlgorithm]*ecdsaVerifier
 
 func init() {
-	algs := map[jwa.SignatureAlgorithm]crypto.Hash{
+	algs := map[jwa.SigningAlgorithm]crypto.Hash{
 		jwa.ES256:  crypto.SHA256,
 		jwa.ES384:  crypto.SHA384,
 		jwa.ES512:  crypto.SHA512,
 		jwa.ES256K: crypto.SHA256,
 	}
-	ecdsaSigners = make(map[jwa.SignatureAlgorithm]*ecdsaSigner)
-	ecdsaVerifiers = make(map[jwa.SignatureAlgorithm]*ecdsaVerifier)
+	ecdsaSigners = make(map[jwa.SigningAlgorithm]*ecdsaSigner)
+	ecdsaVerifiers = make(map[jwa.SigningAlgorithm]*ecdsaVerifier)
 
 	for alg, hash := range algs {
 		ecdsaSigners[alg] = &ecdsaSigner{
@@ -39,13 +39,13 @@ func init() {
 	}
 }
 
-func newECDSASigner(alg jwa.SignatureAlgorithm) Signer {
+func newECDSASigner(alg jwa.SigningAlgorithm) Signer {
 	return ecdsaSigners[alg]
 }
 
 // ecdsaSigners are immutable.
 type ecdsaSigner struct {
-	alg  jwa.SignatureAlgorithm
+	alg  jwa.SigningAlgorithm
 	hash crypto.Hash
 }
 
@@ -143,15 +143,15 @@ func (es *ecdsaSigner) Sign(payload []byte, key interface{}) ([]byte, error) {
 
 // ecdsaVerifiers are immutable.
 type ecdsaVerifier struct {
-	alg  jwa.SignatureAlgorithm
+	alg  jwa.SigningAlgorithm
 	hash crypto.Hash
 }
 
-func newECDSAVerifier(alg jwa.SignatureAlgorithm) Verifier {
+func newECDSAVerifier(alg jwa.SigningAlgorithm) Verifier {
 	return ecdsaVerifiers[alg]
 }
 
-func (v ecdsaVerifier) Algorithm() jwa.SignatureAlgorithm {
+func (v ecdsaVerifier) Algorithm() jwa.SigningAlgorithm {
 	return v.alg
 }
 

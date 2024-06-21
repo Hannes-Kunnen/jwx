@@ -17,7 +17,7 @@ func (fn SignerFactoryFn) Create() (Signer, error) {
 }
 
 var muSignerDB sync.RWMutex
-var signerDB map[jwa.SignatureAlgorithm]SignerFactory
+var signerDB map[jwa.SigningAlgorithm]SignerFactory
 
 // RegisterSigner is used to register a factory object that creates
 // Signer objects based on the given algorithm. Previous object instantiated
@@ -28,10 +28,10 @@ var signerDB map[jwa.SignatureAlgorithm]SignerFactory
 // (probably in your `init()`)
 //
 // Unlike the `UnregisterSigner` function, this function automatically
-// calls `jwa.RegisterSignatureAlgorithm` to register the algorithm
-// in the known algorithms database.
-func RegisterSigner(alg jwa.SignatureAlgorithm, f SignerFactory) {
-	jwa.RegisterSignatureAlgorithm(alg)
+// calls `jwa.RegisterSigningAlgorithm` to register the algorithm
+// in the known-algorithms database.
+func RegisterSigner(alg jwa.SigningAlgorithm, f SignerFactory) {
+	jwa.RegisterSigningAlgorithm(alg)
 	muSignerDB.Lock()
 	signerDB[alg] = f
 	muSignerDB.Unlock()
@@ -49,8 +49,8 @@ func RegisterSigner(alg jwa.SignatureAlgorithm, f SignerFactory) {
 // This is because the algorithm may still be required for verification or
 // some other operation (however unlikely, it is still possible).
 // Therefore, in order to completely remove the algorithm, you must
-// call `jwa.UnregisterSignatureAlgorithm` yourself.
-func UnregisterSigner(alg jwa.SignatureAlgorithm) {
+// call `jwa.UnregisterSigningAlgorithm` yourself.
+func UnregisterSigner(alg jwa.SigningAlgorithm) {
 	muSignerDB.Lock()
 	delete(signerDB, alg)
 	muSignerDB.Unlock()
@@ -59,26 +59,26 @@ func UnregisterSigner(alg jwa.SignatureAlgorithm) {
 }
 
 func init() {
-	signerDB = make(map[jwa.SignatureAlgorithm]SignerFactory)
+	signerDB = make(map[jwa.SigningAlgorithm]SignerFactory)
 
-	for _, alg := range []jwa.SignatureAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512} {
-		RegisterSigner(alg, func(alg jwa.SignatureAlgorithm) SignerFactory {
+	for _, alg := range []jwa.SigningAlgorithm{jwa.RS256, jwa.RS384, jwa.RS512, jwa.PS256, jwa.PS384, jwa.PS512} {
+		RegisterSigner(alg, func(alg jwa.SigningAlgorithm) SignerFactory {
 			return SignerFactoryFn(func() (Signer, error) {
 				return newRSASigner(alg), nil
 			})
 		}(alg))
 	}
 
-	for _, alg := range []jwa.SignatureAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512, jwa.ES256K} {
-		RegisterSigner(alg, func(alg jwa.SignatureAlgorithm) SignerFactory {
+	for _, alg := range []jwa.SigningAlgorithm{jwa.ES256, jwa.ES384, jwa.ES512, jwa.ES256K} {
+		RegisterSigner(alg, func(alg jwa.SigningAlgorithm) SignerFactory {
 			return SignerFactoryFn(func() (Signer, error) {
 				return newECDSASigner(alg), nil
 			})
 		}(alg))
 	}
 
-	for _, alg := range []jwa.SignatureAlgorithm{jwa.HS256, jwa.HS384, jwa.HS512} {
-		RegisterSigner(alg, func(alg jwa.SignatureAlgorithm) SignerFactory {
+	for _, alg := range []jwa.SigningAlgorithm{jwa.HS256, jwa.HS384, jwa.HS512} {
+		RegisterSigner(alg, func(alg jwa.SigningAlgorithm) SignerFactory {
 			return SignerFactoryFn(func() (Signer, error) {
 				return newHMACSigner(alg), nil
 			})
@@ -90,8 +90,8 @@ func init() {
 	}))
 }
 
-// NewSigner creates a signer that signs payloads using the given signature algorithm.
-func NewSigner(alg jwa.SignatureAlgorithm) (Signer, error) {
+// NewSigner creates a signer that signs payloads using the given signing algorithm.
+func NewSigner(alg jwa.SigningAlgorithm) (Signer, error) {
 	muSignerDB.RLock()
 	f, ok := signerDB[alg]
 	muSignerDB.RUnlock()
@@ -99,7 +99,7 @@ func NewSigner(alg jwa.SignatureAlgorithm) (Signer, error) {
 	if ok {
 		return f.Create()
 	}
-	return nil, fmt.Errorf(`unsupported signature algorithm "%s"`, alg)
+	return nil, fmt.Errorf(`unsupported signing algorithm "%s"`, alg)
 }
 
 type noneSigner struct{}

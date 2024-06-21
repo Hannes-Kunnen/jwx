@@ -21,7 +21,7 @@ func main() {
 }
 
 func _main() error {
-	codegen.RegisterZeroVal(`jwa.SignatureAlgorithm`, `""`)
+	codegen.RegisterZeroVal(`jwa.SignatureAlgorithm`, `nil`)
 
 	var objectsFile = flag.String("objects", "objects.yml", "")
 	flag.Parse()
@@ -240,10 +240,17 @@ func generateHeaders(obj *codegen.Object) error {
 	for _, f := range obj.Fields() {
 		o.L("case %sKey:", f.Name(true))
 		if f.Bool(`hasAccept`) {
-			o.L("var acceptor %s", PointerElem(f))
-			o.L("if err := acceptor.Accept(value); err != nil {")
-			o.L("return fmt.Errorf(`invalid value for %%s key: %%w`, %sKey, err)", f.Name(true))
-			o.L("}") // end if err := h.%s.Accept(value)
+			if customAccept := f.String(`customAccept`); customAccept != `` {
+				o.L("acceptor, err := %[1]s(value)", customAccept)
+				o.L("if err != nil {")
+				o.L("return fmt.Errorf(`invalid value for %%s key: %%w`, %sKey, err)", f.Name(true))
+				o.L("}")
+			} else {
+				o.L("var acceptor %s", PointerElem(f))
+				o.L("if err := acceptor.Accept(value); err != nil {")
+				o.L("return fmt.Errorf(`invalid value for %%s key: %%w`, %sKey, err)", f.Name(true))
+				o.L("}") // end if err := h.%s.Accept(value)
+			}
 			o.L("h.%s = &acceptor", f.Name(false))
 			o.L("return nil")
 		} else {
@@ -315,6 +322,18 @@ func generateHeaders(obj *codegen.Object) error {
 			o.L("if err := json.AssignNextBytesToken(&h.%s, dec); err != nil {", f.Name(false))
 			o.L("return fmt.Errorf(`failed to decode value for key %%s`, %sKey, err)", f.Name(true))
 			o.L("}")
+		} else if f.Type() == "jwa.SignatureAlgorithm" {
+			o.L("case %sKey:", f.Name(true))
+			o.L("var decoded string")
+			o.L("if err := dec.Decode(&decoded); err != nil {")
+			o.L("return fmt.Errorf(`failed to decode value for key %%s: %%w`, %sKey, err)", f.Name(true))
+			o.L("}")
+			o.L("signatureAlgorithm, err := %s(decoded)", f.String(`customAccept`))
+			o.L("if err != nil {")
+			o.L("return err")
+			o.L("}")
+			o.L("h.%s = &signatureAlgorithm", f.Name(false))
+
 		} else if f.Type() == "jwk.Key" {
 			o.L("case %sKey:", f.Name(true))
 			o.L("var buf json.RawMessage")

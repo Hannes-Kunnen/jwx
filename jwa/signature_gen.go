@@ -3,6 +3,7 @@ package jwa
 // ToDo: This file should be generated
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -44,9 +45,8 @@ func init() {
 }
 
 func rebuildSignatureAlgorithm() {
-	listSignatureAlgorithm = make([]SignatureAlgorithm, 0, len(allSigningAlgorithms)+1)
-	listSignatureAlgorithm = append(listSignatureAlgorithm, NoSignature)
-	for v := range allSigningAlgorithms {
+	listSignatureAlgorithm = make([]SignatureAlgorithm, 0, len(allSignatureAlgorithms))
+	for v := range allSignatureAlgorithms {
 		listSignatureAlgorithm = append(listSignatureAlgorithm, v)
 	}
 }
@@ -56,4 +56,33 @@ func SignatureAlgorithms() []SignatureAlgorithm {
 	muSignatureAlgorithms.RLock()
 	defer muSignatureAlgorithms.RUnlock()
 	return listSignatureAlgorithm
+}
+
+func SignatureAlgorithmAccept(value interface{}) (SignatureAlgorithm, error) {
+	var signatureAlg SignatureAlgorithm
+	if x, ok := value.(SignatureAlgorithm); ok {
+		signatureAlg = x
+	} else {
+		var signingAlg SigningAlgorithm
+		signingAlgErr := signingAlg.Accept(value)
+		if signingAlgErr != nil {
+			var noSignatureAlg NoSignatureAlgorithm
+			noSignatureAlgErr := noSignatureAlg.Accept(value)
+			if noSignatureAlgErr != nil {
+				return nil, fmt.Errorf(
+					`invalid value for jwa.SignatureAlgorithm: %w, %w`,
+					signingAlgErr,
+					noSignatureAlgErr,
+				)
+			} else {
+				signatureAlg = noSignatureAlg
+			}
+		} else {
+			signatureAlg = signingAlg
+		}
+	}
+	if _, ok := allSignatureAlgorithms[signatureAlg]; !ok {
+		return nil, fmt.Errorf(`invalid jwa.SignatureAlgorithm value`)
+	}
+	return signatureAlg, nil
 }

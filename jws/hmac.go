@@ -11,10 +11,10 @@ import (
 	"github.com/lestrrat-go/jwx/v2/jwa"
 )
 
-var hmacSignFuncs = map[jwa.SignatureAlgorithm]hmacSignFunc{}
+var hmacSignFuncs = map[jwa.SigningAlgorithm]hmacSignFunc{}
 
 func init() {
-	algs := map[jwa.SignatureAlgorithm]func() hash.Hash{
+	algs := map[jwa.SigningAlgorithm]func() hash.Hash{
 		jwa.HS256: sha256.New,
 		jwa.HS384: sha512.New384,
 		jwa.HS512: sha512.New,
@@ -25,7 +25,7 @@ func init() {
 	}
 }
 
-func newHMACSigner(alg jwa.SignatureAlgorithm) Signer {
+func newHMACSigner(alg jwa.SigningAlgorithm) Signer {
 	return &HMACSigner{
 		alg:  alg,
 		sign: hmacSignFuncs[alg], // we know this will succeed
@@ -59,7 +59,7 @@ func (s HMACSigner) Sign(payload []byte, key interface{}) ([]byte, error) {
 	return s.sign(payload, hmackey)
 }
 
-func newHMACVerifier(alg jwa.SignatureAlgorithm) Verifier {
+func newHMACVerifier(alg jwa.SigningAlgorithm) Verifier {
 	s := newHMACSigner(alg)
 	return &HMACVerifier{signer: s}
 }

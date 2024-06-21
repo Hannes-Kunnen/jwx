@@ -72,7 +72,7 @@ type KeyProvider interface {
 // KeySink is a data storage where `jws.KeyProvider` objects should
 // send their keys to.
 type KeySink interface {
-	Key(jwa.SignatureAlgorithm, interface{})
+	Key(jwa.SigningAlgorithm, interface{})
 }
 
 type algKeyPair struct {
@@ -85,14 +85,14 @@ type algKeySink struct {
 	list []algKeyPair
 }
 
-func (s *algKeySink) Key(alg jwa.SignatureAlgorithm, key interface{}) {
+func (s *algKeySink) Key(alg jwa.SigningAlgorithm, key interface{}) {
 	s.mu.Lock()
 	s.list = append(s.list, algKeyPair{alg, key})
 	s.mu.Unlock()
 }
 
 type staticKeyProvider struct {
-	alg jwa.SignatureAlgorithm
+	alg jwa.SigningAlgorithm
 	key interface{}
 }
 
@@ -115,9 +115,9 @@ func (kp *keySetProvider) selectKey(sink KeySink, key jwk.Key, sig *Signature, _
 	}
 
 	if v := key.Algorithm(); v.String() != "" {
-		var alg jwa.SignatureAlgorithm
+		var alg jwa.SigningAlgorithm
 		if err := alg.Accept(v); err != nil {
-			return fmt.Errorf(`invalid signature algorithm %s: %w`, key.Algorithm(), err)
+			return fmt.Errorf(`invalid signing algorithm %s: %w`, key.Algorithm(), err)
 		}
 
 		sink.Key(alg, key)
@@ -131,7 +131,7 @@ func (kp *keySetProvider) selectKey(sink KeySink, key jwk.Key, sig *Signature, _
 		}
 
 		// bail out if the JWT has a `alg` field, and it doesn't match
-		if tokAlg := sig.ProtectedHeaders().Algorithm(); tokAlg != "" {
+		if tokAlg := sig.ProtectedHeaders().Algorithm(); tokAlg != nil {
 			for _, alg := range algs {
 				if tokAlg == alg {
 					sink.Key(alg, key)
@@ -254,9 +254,9 @@ func (kp jkuProvider) FetchKeys(ctx context.Context, sink KeySink, sig *Signatur
 
 	hdrAlg := sig.ProtectedHeaders().Algorithm()
 	for _, alg := range algs {
-		// if we have a "alg" field in the JWS, we can only proceed if
+		// if we have an "alg" field in the JWS, we can only proceed if
 		// the inferred algorithm matches
-		if hdrAlg != "" && hdrAlg != alg {
+		if hdrAlg != nil && hdrAlg != alg {
 			continue
 		}
 
