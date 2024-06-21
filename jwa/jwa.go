@@ -6,18 +6,19 @@ package jwa
 import "fmt"
 
 // KeyAlgorithm is a workaround for jwk.Key being able to contain different
-// types of algorithms in its `alg` field.
+// types of algorithms in its `alg` field. It can only contain a SigningAlgorithm or a
+// KeyEncryptionAlgorithm.
 //
 // Previously the storage for the `alg` field was represented as a string,
 // but this caused some users to wonder why the field was not typed appropriately
 // like other fields.
 //
-// Ideally we would like to keep track of Signature Algorithms and
-// Content Encryption Algorithms separately, and force the APIs to
-// type-check at compile time, but this allows users to pass a value from a
+// Ideally we would like to keep track of SigningAlgorithms and KeyEncryptionAlgorithms separately,
+// and force the APIs to type-check at compile time, but this allows users to pass a value from a
 // jwk.Key directly
 type KeyAlgorithm interface {
 	String() string
+	IsSymmetric() bool
 }
 
 // InvalidKeyAlgorithm represents an algorithm that the library is not aware of.
@@ -27,11 +28,15 @@ func (s InvalidKeyAlgorithm) String() string {
 	return string(s)
 }
 
+func (s InvalidKeyAlgorithm) IsSymmetric() bool {
+	return false
+}
+
 func (InvalidKeyAlgorithm) Accept(_ interface{}) error {
 	return fmt.Errorf(`jwa.InvalidKeyAlgorithm does not support Accept() method calls`)
 }
 
-// KeyAlgorithmFrom takes either a string, `jwa.SignatureAlgorithm` or `jwa.KeyEncryptionAlgorithm`
+// KeyAlgorithmFrom takes either a string, `jwa.SigningAlgorithm` or `jwa.KeyEncryptionAlgorithm`
 // and returns a `jwa.KeyAlgorithm`.
 //
 // If the value cannot be handled, it returns an `jwa.InvalidKeyAlgorithm`
@@ -39,12 +44,12 @@ func (InvalidKeyAlgorithm) Accept(_ interface{}) error {
 // users to directly pass the return value to functions such as `jws.Sign()`
 func KeyAlgorithmFrom(v interface{}) KeyAlgorithm {
 	switch v := v.(type) {
-	case SignatureAlgorithm:
+	case SigningAlgorithm:
 		return v
 	case KeyEncryptionAlgorithm:
 		return v
 	case string:
-		var salg SignatureAlgorithm
+		var salg SigningAlgorithm
 		if err := salg.Accept(v); err == nil {
 			return salg
 		}

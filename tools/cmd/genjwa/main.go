@@ -22,8 +22,10 @@ func main() {
 func _main() error {
 	typs := []typ{
 		{
-			name:     `CompressionAlgorithm`,
-			comment:  `CompressionAlgorithm represents the compression algorithms as described in https://tools.ietf.org/html/rfc7518#section-7.3`,
+			name: `CompressionAlgorithm`,
+			comments: []string{
+				`CompressionAlgorithm represents the compression algorithms as described in https://tools.ietf.org/html/rfc7518#section-7.3`,
+			},
 			filename: `compression_gen.go`,
 			elements: []element{
 				{
@@ -39,8 +41,10 @@ func _main() error {
 			},
 		},
 		{
-			name:     `ContentEncryptionAlgorithm`,
-			comment:  `ContentEncryptionAlgorithm represents the various encryption algorithms as described in https://tools.ietf.org/html/rfc7518#section-5`,
+			name: `ContentEncryptionAlgorithm`,
+			comments: []string{
+				`ContentEncryptionAlgorithm represents the various encryption algorithms as described in https://tools.ietf.org/html/rfc7518#section-5`,
+			},
 			filename: `content_encryption_gen.go`,
 			elements: []element{
 				{
@@ -77,7 +81,7 @@ func _main() error {
 		},
 		{
 			name:     `KeyType`,
-			comment:  `KeyType represents the key type ("kty") that are supported`,
+			comments: []string{`KeyType represents the key type ("kty") that are supported`},
 			filename: "key_type_gen.go",
 			elements: []element{
 				{
@@ -110,7 +114,7 @@ func _main() error {
 		},
 		{
 			name:     `EllipticCurveAlgorithm`,
-			comment:  `EllipticCurveAlgorithm represents the algorithms used for EC keys`,
+			comments: []string{`EllipticCurveAlgorithm represents the algorithms used for EC keys`},
 			filename: `elliptic_gen.go`,
 			elements: []element{
 				{
@@ -149,28 +153,31 @@ func _main() error {
 			},
 		},
 		{
-			name:     `SignatureAlgorithm`,
-			comment:  `SignatureAlgorithm represents the various signature algorithms as described in https://tools.ietf.org/html/rfc7518#section-3.1`,
-			filename: `signature_gen.go`,
+			name: `SigningAlgorithm`,
+			comments: []string{
+				`SigningAlgorithm represents the various algorithms that can be used to sign a payload.`,
+				`These are described in https://tools.ietf.org/html/rfc7518#section-3.1.`,
+				`Keep in mind that NoSignature is not a part of this as no signing can be performed with this value`,
+			},
+			filename: `signing_gen.go`,
 			elements: []element{
-				{
-					name:  `NoSignature`,
-					value: "none",
-				},
 				{
 					name:    `HS256`,
 					value:   "HS256",
 					comment: `HMAC using SHA-256`,
+					sym:     true,
 				},
 				{
 					name:    `HS384`,
 					value:   `HS384`,
 					comment: `HMAC using SHA-384`,
+					sym:     true,
 				},
 				{
 					name:    `HS512`,
 					value:   "HS512",
 					comment: `HMAC using SHA-512`,
+					sym:     true,
 				},
 				{
 					name:    `RS256`,
@@ -230,8 +237,22 @@ func _main() error {
 			},
 		},
 		{
+			name: `NoSignatureAlgorithm`,
+			comments: []string{
+				`NoSignatureAlgorithm represents the "none" algorithm that indicates no signature is used.`,
+				`This is described in https://tools.ietf.org/html/rfc7518#section-3.1.`,
+			},
+			filename: `no_signature_gen.go`,
+			elements: []element{
+				{
+					name:  `NoSignature`,
+					value: "none",
+				},
+			},
+		},
+		{
 			name:     `KeyEncryptionAlgorithm`,
-			comment:  `KeyEncryptionAlgorithm represents the various encryption algorithms as described in https://tools.ietf.org/html/rfc7518#section-4.1`,
+			comments: []string{`KeyEncryptionAlgorithm represents the various encryption algorithms as described in https://tools.ietf.org/html/rfc7518#section-4.1`},
 			filename: `key_encryption_gen.go`,
 			elements: []element{
 				{
@@ -263,21 +284,25 @@ func _main() error {
 					name:    `A128KW`,
 					value:   "A128KW",
 					comment: `AES key wrap (128)`,
+					sym:     true,
 				},
 				{
 					name:    `A192KW`,
 					value:   "A192KW",
 					comment: `AES key wrap (192)`,
+					sym:     true,
 				},
 				{
 					name:    `A256KW`,
 					value:   "A256KW",
 					comment: `AES key wrap (256)`,
+					sym:     true,
 				},
 				{
 					name:    `DIRECT`,
 					value:   "dir",
 					comment: `Direct encryption`,
+					sym:     true,
 				},
 				{
 					name:    `ECDH_ES`,
@@ -303,31 +328,37 @@ func _main() error {
 					name:    `A128GCMKW`,
 					value:   "A128GCMKW",
 					comment: `AES-GCM key wrap (128)`,
+					sym:     true,
 				},
 				{
 					name:    `A192GCMKW`,
 					value:   "A192GCMKW",
 					comment: `AES-GCM key wrap (192)`,
+					sym:     true,
 				},
 				{
 					name:    `A256GCMKW`,
 					value:   "A256GCMKW",
 					comment: `AES-GCM key wrap (256)`,
+					sym:     true,
 				},
 				{
 					name:    `PBES2_HS256_A128KW`,
 					value:   "PBES2-HS256+A128KW",
 					comment: `PBES2 + HMAC-SHA256 + AES key wrap (128)`,
+					sym:     true,
 				},
 				{
 					name:    `PBES2_HS384_A192KW`,
 					value:   "PBES2-HS384+A192KW",
 					comment: `PBES2 + HMAC-SHA384 + AES key wrap (192)`,
+					sym:     true,
 				},
 				{
 					name:    `PBES2_HS512_A256KW`,
 					value:   "PBES2-HS512+A256KW",
 					comment: `PBES2 + HMAC-SHA512 + AES key wrap (256)`,
+					sym:     true,
 				},
 			},
 		},
@@ -354,7 +385,7 @@ func _main() error {
 
 type typ struct {
 	name     string
-	comment  string
+	comments []string
 	filename string
 	elements []element
 }
@@ -364,20 +395,7 @@ type element struct {
 	value   string
 	comment string
 	invalid bool
-}
-
-var isSymmetricKeyEncryption = map[string]struct{}{
-	`A128KW`:    {},
-	`A192KW`:    {},
-	`A256KW`:    {},
-	`DIRECT`:    {},
-	`A128GCMKW`: {},
-	`A192GCMKW`: {},
-	`A256GCMKW`: {},
-
-	`PBES2_HS256_A128KW`: {},
-	`PBES2_HS384_A192KW`: {},
-	`PBES2_HS512_A256KW`: {},
+	sym     bool
 }
 
 func (t typ) Generate() error {
@@ -397,20 +415,45 @@ func (t typ) Generate() error {
 	}
 	o.L(")")
 
-	o.LL("// %s", t.comment)
+	for i, comment := range t.comments {
+		if i == 0 {
+			o.LL("// %s", comment)
+		} else {
+			o.L("// %s", comment)
+		}
+	}
 	o.L("type %s string", t.name)
-
-	o.LL("// Supported values for %s", t.name)
-	o.L("const (")
-	for _, e := range t.elements {
-		o.L("%s %s = %s", e.name, t.name, strconv.Quote(e.value))
+	if t.name == "NoSignatureAlgorithm" {
+		if len(t.elements) != 1 {
+			return fmt.Errorf(
+				"NoSignatureAlgorithm should contain strictly 1 element, got: %d",
+				len(t.elements),
+			)
+		}
+		e := t.elements[0]
+		o.LL("// Only supported value for %s", t.name)
+		o.L("const %s %s = %s", e.name, t.name, strconv.Quote(e.value))
 		if len(e.comment) > 0 {
 			o.R(" // %s", e.comment)
 		}
+	} else {
+		o.LL("// Supported values for %s", t.name)
+		o.L("const (")
+		for _, e := range t.elements {
+			o.L("%s %s = %s", e.name, t.name, strconv.Quote(e.value))
+			if len(e.comment) > 0 {
+				o.R(" // %s", e.comment)
+			}
+		}
+		o.L(")") // end const
 	}
-	o.L(")") // end const
 
-	// Register%s and related tools are provided so users can register their own types.
+	// Skip all multi-value code.
+	if t.name == "NoSignatureAlgorithm" {
+		goto endMultiValue
+	}
+
+	// Registers and related tools are provided so users can register their own types.
 	// This triggers some re-building of data structures that are otherwise
 	// reused for efficiency
 	o.LL("var mu%[1]ss sync.RWMutex", t.name)
@@ -420,6 +463,10 @@ func (t typ) Generate() error {
 	o.LL("func init() {")
 	o.L("mu%[1]ss.Lock()", t.name)
 	o.L("defer mu%[1]ss.Unlock()", t.name)
+	if t.name == "SigningAlgorithm" {
+		o.L("mu%[1]ss.Lock()", "SignatureAlgorithm")
+		o.L("defer mu%[1]ss.Unlock()", "SignatureAlgorithm")
+	}
 	o.L("all%[1]ss = make(map[%[1]s]struct{})", t.name)
 	for _, e := range t.elements {
 		if !e.invalid {
@@ -427,27 +474,50 @@ func (t typ) Generate() error {
 		}
 	}
 	o.L("rebuild%[1]s()", t.name)
+	if t.name == "SigningAlgorithm" {
+		o.L("rebuild%[1]s()", "SignatureAlgorithm")
+	}
 	o.L("}")
 
 	o.LL("// Register%[1]s registers a new %[1]s so that the jwx can properly handle the new value.", t.name)
+	if t.name == "SigningAlgorithm" {
+		o.L("// Keep in mind that this is linked to will also add a new %[1]s as these are linked.", "SignatureAlgorithm")
+	}
 	o.L("// Duplicates will silently be ignored")
 	o.L("func Register%[1]s(v %[1]s) {", t.name)
 	o.L("mu%[1]ss.Lock()", t.name)
 	o.L("defer mu%[1]ss.Unlock()", t.name)
+	if t.name == "SigningAlgorithm" {
+		o.L("mu%[1]ss.Lock()", "SignatureAlgorithm")
+		o.L("defer mu%[1]ss.Unlock()", "SignatureAlgorithm")
+	}
 	o.L("if _, ok := all%[1]ss[v]; !ok {", t.name)
 	o.L("all%[1]ss[v] = struct{}{}", t.name)
 	o.L("rebuild%[1]s()", t.name)
+	if t.name == "SigningAlgorithm" {
+		o.L("rebuild%[1]s()", "SignatureAlgorithm")
+	}
 	o.L("}")
 	o.L("}")
 
 	o.LL("// Unregister%[1]s unregisters a %[1]s from its known database.", t.name)
-	o.L("// Non-existentn entries will silently be ignored")
+	if t.name == "SigningAlgorithm" {
+		o.L("// Keep in mind that this will also remove the linked %[1]s.", "SignatureAlgorithm")
+	}
+	o.L("// Non-existent entries will silently be ignored")
 	o.L("func Unregister%[1]s(v %[1]s) {", t.name)
 	o.L("mu%[1]ss.Lock()", t.name)
 	o.L("defer mu%[1]ss.Unlock()", t.name)
+	if t.name == "SigningAlgorithm" {
+		o.L("mu%[1]ss.Lock()", "SignatureAlgorithm")
+		o.L("defer mu%[1]ss.Unlock()", "SignatureAlgorithm")
+	}
 	o.L("if _, ok := all%[1]ss[v]; ok {", t.name)
 	o.L("delete(all%[1]ss, v)", t.name)
 	o.L("rebuild%[1]s()", t.name)
+	if t.name == "SigningAlgorithm" {
+		o.L("rebuild%[1]s()", "SignatureAlgorithm")
+	}
 	o.L("}")
 	o.L("}")
 
@@ -468,6 +538,7 @@ func (t typ) Generate() error {
 	o.L("return list%s", t.name)
 	o.L("}")
 
+endMultiValue:
 	o.LL("// Accept is used when conversion from values given by")
 	o.L("// outside sources (such as JSON payloads) is required")
 	o.L("func (v *%s) Accept(value interface{}) error {", t.name)
@@ -487,7 +558,11 @@ func (t typ) Generate() error {
 	o.L("tmp = %s(s)", t.name)
 	o.L("}")
 
-	o.L("if _, ok := all%ss[tmp]; !ok {", t.name)
+	if t.name == "NoSignatureAlgorithm" {
+		o.L("if tmp != NoSignature {")
+	} else {
+		o.L("if _, ok := all%ss[tmp]; !ok {", t.name)
+	}
 	o.L("return fmt.Errorf(`invalid jwa.%s value`)", t.name)
 	o.L("}")
 
@@ -500,22 +575,26 @@ func (t typ) Generate() error {
 	o.L("return string(v)")
 	o.L("}")
 
-	if t.name == "KeyEncryptionAlgorithm" {
+	if t.name == "SigningAlgorithm" || t.name == "NoSignatureAlgorithm" {
+		o.LL("// isSignatureAlgorithm is just added so it would qualify as a SignatureAlgorithm.")
+		o.L("func (v %s) isSignatureAlgorithm() {}", t.name)
+	}
+
+	if t.name == "SigningAlgorithm" || t.name == "KeyEncryptionAlgorithm" {
 		o.LL("// IsSymmetric returns true if the algorithm is a symmetric type")
 		o.L("func (v %s) IsSymmetric() bool {", t.name)
 		o.L("switch v {")
 		o.L("case ")
 		var count int
 		for _, e := range t.elements {
-			if _, ok := isSymmetricKeyEncryption[e.name]; !ok {
-				continue
+			if e.sym {
+				if count == 0 {
+					o.R("%s", e.name)
+				} else {
+					o.R(",%s", e.name)
+				}
+				count++
 			}
-			if count == 0 {
-				o.R("%s", e.name)
-			} else {
-				o.R(",%s", e.name)
-			}
-			count++
 		}
 		o.R(":")
 		o.L("return true")
@@ -528,6 +607,7 @@ func (t typ) Generate() error {
 		if cfe, ok := err.(codegen.CodeFormatError); ok {
 			fmt.Fprint(os.Stderr, cfe.Source())
 		}
+		fmt.Printf("Error: %+v\n", err)
 		return fmt.Errorf(`failed to write to %s: %w`, t.filename, err)
 	}
 	return nil
@@ -631,12 +711,12 @@ func (t typ) GenerateTest() error {
 	o.L("}")
 	o.L("})")
 
-	if t.name == "KeyEncryptionAlgorithm" {
+	if t.name == "SigningAlgorithm" || t.name == "KeyEncryptionAlgorithm" {
 		o.L("t.Run(`check symmetric values`, func(t *testing.T) {")
 		o.L("t.Parallel()")
 		for _, e := range t.elements {
 			o.L("t.Run(`%s`, func(t *testing.T) {", e.name)
-			if _, ok := isSymmetricKeyEncryption[e.name]; ok {
+			if e.sym {
 				o.L("assert.True(t, jwa.%[1]s.IsSymmetric(), `jwa.%[1]s should be symmetric`)", e.name)
 			} else {
 				o.L("assert.False(t, jwa.%[1]s.IsSymmetric(), `jwa.%[1]s should NOT be symmetric`)", e.name)
@@ -644,6 +724,11 @@ func (t typ) GenerateTest() error {
 			o.L("})")
 		}
 		o.L("})")
+	}
+
+	// Skip all multi-value tests.
+	if t.name == "NoSignatureAlgorithm" {
+		goto endMultiValue
 	}
 
 	o.L("t.Run(`check list of elements`, func(t *testing.T) {")
@@ -672,7 +757,7 @@ func (t typ) GenerateTest() error {
 	o.L("return")
 	o.L("}")
 	o.L("})")
-
+endMultiValue:
 	o.L("}")
 
 	filename := strings.Replace(t.filename, "_gen.go", "_gen_test.go", 1)
