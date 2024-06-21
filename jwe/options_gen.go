@@ -260,7 +260,7 @@ func WithKeyProvider(v KeyProvider) DecryptOption {
 // return the key used for decryption. This may be useful when
 // you specify multiple key sources or if you pass a `jwk.Set`
 // and you want to know which key was successful at decrypting the
-// signature.
+// CEK.
 //
 // `v` must be a pointer to an empty `interface{}`. Do not use
 // `jwk.Key` here unless you are 100% sure that all keys that you

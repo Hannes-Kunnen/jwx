@@ -486,7 +486,7 @@ type decryptCtx struct {
 // When using `jwe.WithKeyEncryptionAlgorithm()`, you can pass a `jwa.KeyAlgorithm`
 // for convenience: this is mainly to allow you to directly pass the result of `(jwk.Key).Algorithm()`.
 // However, do note that while `(jwk.Key).Algorithm()` could very well contain key encryption
-// algorithms, it could also contain other types of values, such as _signature algorithms_.
+// algorithms, it could also contain other types of values, such as _signing algorithms_.
 // In order for `jwe.Decrypt` to work properly, the `alg` parameter must be of type
 // `jwa.KeyEncryptionAlgorithm` or otherwise it will cause an error.
 //
@@ -624,7 +624,7 @@ func (dctx *decryptCtx) try(ctx context.Context, recipient Recipient, keyUsed in
 			tried++
 			// alg is converted here because pair.alg is of type jwa.KeyAlgorithm.
 			// this may seem ugly, but we're trying to avoid declaring separate
-			// structs for `alg jwa.KeyAlgorithm` and `alg jwa.SignatureAlgorithm`
+			// structs for `alg jwa.KeyEncryptionAlgorithm` and `alg jwa.SigningAlgorithm`
 			//nolint:forcetypeassert
 			alg := pair.alg.(jwa.KeyEncryptionAlgorithm)
 			key := pair.key
