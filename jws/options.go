@@ -61,8 +61,8 @@ func (w *withKey) Protected(v Headers) Headers {
 // then you will get an error when `jws.Sign()` or `jws.Verify()` is executed.
 //
 // The `alg` parameter cannot be "none" (jwa.NoSignature) for security reasons.
-// You will have to use a separate, more explicit option to allow the use of "none"
-// algorithm.
+// You will have to use a separate, more explicit option (WithInsecureNoSignature) to allow the use
+// of the "none" algorithm.
 //
 // The algorithm specified in the `alg` parameter MUST be able to support
 // the type of key you provided, otherwise an error is returned.

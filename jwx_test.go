@@ -240,7 +240,7 @@ func TestJoseCompatibility(t *testing.T) {
 	})
 	t.Run("jws", func(t *testing.T) {
 		t.Parallel()
-		tests := []jwa.SignatureAlgorithm{
+		tests := []jwa.SigningAlgorithm{
 			jwa.ES256,
 			//jwa.ES256K,
 			jwa.ES384,
@@ -352,7 +352,7 @@ func joseInteropTest(ctx context.Context, spec interopTest, t *testing.T) {
 	})
 }
 
-func joseJwsInteropTest(ctx context.Context, alg jwa.SignatureAlgorithm, t *testing.T) {
+func joseJwsInteropTest(ctx context.Context, alg jwa.SigningAlgorithm, t *testing.T) {
 	t.Helper()
 
 	expected := []byte(`{"foo":"bar"}`)
@@ -563,7 +563,7 @@ func TestGH996(t *testing.T) {
 
 	testcases := []struct {
 		Name                    string
-		Algorithm               jwa.SignatureAlgorithm
+		Algorithm               jwa.SigningAlgorithm
 		ValidSigningKeys        []interface{}
 		InvalidSigningKeys      []interface{}
 		ValidVerificationKeys   []interface{}
