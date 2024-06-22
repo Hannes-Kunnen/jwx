@@ -467,9 +467,11 @@ LOOP:
 				if err := dec.Decode(&decoded); err != nil {
 					return fmt.Errorf(`failed to decode value for key %s: %w`, AlgorithmKey, err)
 				}
-				signatureAlgorithm, err := jwa.SignatureAlgorithmAccept(decoded)
-				if err != nil {
-					return err
+				var signatureAlgorithm jwa.SignatureAlgorithm
+				if jwa.NoSignatureAlgorithm(decoded) == jwa.NoSignature {
+					signatureAlgorithm = jwa.NoSignature
+				} else {
+					signatureAlgorithm = jwa.SigningAlgorithm(decoded)
 				}
 				h.algorithm = &signatureAlgorithm
 			case ContentTypeKey:

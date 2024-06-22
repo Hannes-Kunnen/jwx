@@ -328,12 +328,13 @@ func generateHeaders(obj *codegen.Object) error {
 			o.L("if err := dec.Decode(&decoded); err != nil {")
 			o.L("return fmt.Errorf(`failed to decode value for key %%s: %%w`, %sKey, err)", f.Name(true))
 			o.L("}")
-			o.L("signatureAlgorithm, err := %s(decoded)", f.String(`customAccept`))
-			o.L("if err != nil {")
-			o.L("return err")
+			o.L("var signatureAlgorithm jwa.SignatureAlgorithm")
+			o.L("if jwa.NoSignatureAlgorithm(decoded) == jwa.NoSignature {")
+			o.L("signatureAlgorithm = jwa.NoSignature")
+			o.L("} else {")
+			o.L("signatureAlgorithm = jwa.SigningAlgorithm(decoded)")
 			o.L("}")
 			o.L("h.%s = &signatureAlgorithm", f.Name(false))
-
 		} else if f.Type() == "jwk.Key" {
 			o.L("case %sKey:", f.Name(true))
 			o.L("var buf json.RawMessage")
