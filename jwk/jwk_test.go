@@ -57,10 +57,6 @@ func init() {
 	}
 
 	commonDef = map[string]keyDef{
-		jwk.AlgorithmKey: {
-			Method: "Algorithm",
-			Value:  jwa.KeyAlgorithmFrom("random-algorithm"),
-		},
 		jwk.KeyIDKey: {
 			Method: "KeyID",
 			Value:  "12312rdfsdfer2342342",
@@ -1096,6 +1092,10 @@ func TestRSA(t *testing.T) {
 	t.Run("PublicKey", func(t *testing.T) {
 		t.Parallel()
 		VerifyKey(t, map[string]keyDef{
+			jwk.AlgorithmKey: {
+				Method: "Algorithm",
+				Value:  jwa.KeyAlgorithmFrom("RS256"),
+			},
 			jwk.RSAEKey: expectBase64(keyDef{
 				Method: "E",
 				Value:  "AQAB",
@@ -1123,6 +1123,10 @@ func TestRSA(t *testing.T) {
 	t.Run("Private Key", func(t *testing.T) {
 		t.Parallel()
 		VerifyKey(t, map[string]keyDef{
+			jwk.AlgorithmKey: {
+				Method: "Algorithm",
+				Value:  jwa.KeyAlgorithmFrom("RS256"),
+			},
 			jwk.KeyTypeKey: {
 				Method: "KeyType",
 				Value:  jwa.RSA,
@@ -1241,6 +1245,10 @@ func TestECDSA(t *testing.T) {
 			}
 		})
 		VerifyKey(t, map[string]keyDef{
+			jwk.AlgorithmKey: {
+				Method: "Algorithm",
+				Value:  jwa.KeyAlgorithmFrom("ES256"),
+			},
 			jwk.KeyTypeKey: {
 				Method: "KeyType",
 				Value:  jwa.EC,
@@ -1281,6 +1289,10 @@ func TestECDSA(t *testing.T) {
 			}
 		})
 		VerifyKey(t, map[string]keyDef{
+			jwk.AlgorithmKey: {
+				Method: "Algorithm",
+				Value:  jwa.KeyAlgorithmFrom("ES256"),
+			},
 			jwk.KeyTypeKey: {
 				Method: "KeyType",
 				Value:  jwa.EC,
@@ -1338,6 +1350,10 @@ func TestECDSA(t *testing.T) {
 func TestSymmetric(t *testing.T) {
 	t.Run("Key", func(t *testing.T) {
 		VerifyKey(t, map[string]keyDef{
+			jwk.AlgorithmKey: {
+				Method: "Algorithm",
+				Value:  jwa.KeyAlgorithmFrom("HS256"),
+			},
 			jwk.KeyTypeKey: {
 				Method: "KeyType",
 				Value:  jwa.OctetSeq,
@@ -1358,6 +1374,10 @@ func TestOKP(t *testing.T) {
 		t.Run("PrivateKey", func(t *testing.T) {
 			t.Parallel()
 			VerifyKey(t, map[string]keyDef{
+				jwk.AlgorithmKey: {
+					Method: "Algorithm",
+					Value:  jwa.KeyAlgorithmFrom("EdDSA"),
+				},
 				jwk.KeyTypeKey: {
 					Method: "KeyType",
 					Value:  jwa.OKP,
@@ -1379,6 +1399,10 @@ func TestOKP(t *testing.T) {
 		t.Run("PublicKey", func(t *testing.T) {
 			t.Parallel()
 			VerifyKey(t, map[string]keyDef{
+				jwk.AlgorithmKey: {
+					Method: "Algorithm",
+					Value:  jwa.KeyAlgorithmFrom("EdDSA"),
+				},
 				jwk.KeyTypeKey: {
 					Method: "KeyType",
 					Value:  jwa.OKP,
@@ -1399,6 +1423,10 @@ func TestOKP(t *testing.T) {
 		t.Run("PublicKey", func(t *testing.T) {
 			t.Parallel()
 			VerifyKey(t, map[string]keyDef{
+				jwk.AlgorithmKey: {
+					Method: "Algorithm",
+					Value:  jwa.KeyAlgorithmFrom("ECDH-ES+A128KW"),
+				},
 				jwk.KeyTypeKey: {
 					Method: "KeyType",
 					Value:  jwa.OKP,

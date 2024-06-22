@@ -53,7 +53,7 @@ type KeyType struct {
 func _main() error {
 	codegen.RegisterZeroVal(`jwa.EllipticCurveAlgorithm`, `jwa.InvalidEllipticCurve`)
 	codegen.RegisterZeroVal(`jwa.KeyType`, `jwa.InvalidKeyType`)
-	codegen.RegisterZeroVal(`jwa.KeyAlgorithm`, `jwa.InvalidKeyAlgorithm("")`)
+	codegen.RegisterZeroVal(`jwa.KeyAlgorithm`, `nil`)
 
 	var objectsFile = flag.String("objects", "objects.yml", "")
 	flag.Parse()

@@ -69,7 +69,7 @@ func (h *okpPublicKey) Algorithm() jwa.KeyAlgorithm {
 	if h.algorithm != nil {
 		return *(h.algorithm)
 	}
-	return jwa.InvalidKeyAlgorithm("")
+	return nil
 }
 
 func (h *okpPublicKey) Crv() jwa.EllipticCurveAlgorithm {
@@ -607,7 +607,7 @@ func (h *okpPrivateKey) Algorithm() jwa.KeyAlgorithm {
 	if h.algorithm != nil {
 		return *(h.algorithm)
 	}
-	return jwa.InvalidKeyAlgorithm("")
+	return nil
 }
 
 func (h *okpPrivateKey) Crv() jwa.EllipticCurveAlgorithm {

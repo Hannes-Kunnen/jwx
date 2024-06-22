@@ -97,7 +97,7 @@ func TestHeader(t *testing.T) {
 		if !assert.NoError(t, h.Set("Default", dummy), `Setting "Default" should succeed`) {
 			return
 		}
-		if !assert.Empty(t, h.Algorithm().String(), "Algorithm should be empty string") {
+		if !assert.Nil(t, h.Algorithm(), "Algorithm should be nil") {
 			return
 		}
 		if h.KeyID() != "" {

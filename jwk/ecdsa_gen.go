@@ -73,7 +73,7 @@ func (h *ecdsaPublicKey) Algorithm() jwa.KeyAlgorithm {
 	if h.algorithm != nil {
 		return *(h.algorithm)
 	}
-	return jwa.InvalidKeyAlgorithm("")
+	return nil
 }
 
 func (h *ecdsaPublicKey) Crv() jwa.EllipticCurveAlgorithm {
@@ -641,7 +641,7 @@ func (h *ecdsaPrivateKey) Algorithm() jwa.KeyAlgorithm {
 	if h.algorithm != nil {
 		return *(h.algorithm)
 	}
-	return jwa.InvalidKeyAlgorithm("")
+	return nil
 }
 
 func (h *ecdsaPrivateKey) Crv() jwa.EllipticCurveAlgorithm {

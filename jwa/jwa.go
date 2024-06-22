@@ -3,8 +3,6 @@
 // Package jwa defines the various algorithm described in https://tools.ietf.org/html/rfc7518
 package jwa
 
-import "fmt"
-
 // KeyAlgorithm is a workaround for jwk.Key being able to contain different
 // types of algorithms in its `alg` field. It can only contain a SigningAlgorithm or a
 // KeyEncryptionAlgorithm.
@@ -22,29 +20,11 @@ type KeyAlgorithm interface {
 	keyAlgorithm()
 }
 
-// InvalidKeyAlgorithm represents an algorithm that the library is not aware of.
-type InvalidKeyAlgorithm string
-
-func (s InvalidKeyAlgorithm) String() string {
-	return string(s)
-}
-
-func (s InvalidKeyAlgorithm) IsSymmetric() bool {
-	return false
-}
-
-func (InvalidKeyAlgorithm) keyAlgorithm() {}
-
-func (InvalidKeyAlgorithm) Accept(_ interface{}) error {
-	return fmt.Errorf(`jwa.InvalidKeyAlgorithm does not support Accept() method calls`)
-}
-
 // KeyAlgorithmFrom takes either a string, `jwa.SigningAlgorithm` or `jwa.KeyEncryptionAlgorithm`
 // and returns a `jwa.KeyAlgorithm`.
 //
-// If the value cannot be handled, it returns an `jwa.InvalidKeyAlgorithm`
-// object instead of returning an error. This design choice was made to allow
-// users to directly pass the return value to functions such as `jws.Sign()`
+// If the value cannot be handled, it returns nil instead of returning an error. This design choice
+// was made to allow users to directly pass the return value to functions such as `jws.WithKey()`
 func KeyAlgorithmFrom(v interface{}) KeyAlgorithm {
 	switch v := v.(type) {
 	case SigningAlgorithm:
@@ -62,8 +42,8 @@ func KeyAlgorithmFrom(v interface{}) KeyAlgorithm {
 			return kealg
 		}
 
-		return InvalidKeyAlgorithm(v)
+		return nil
 	default:
-		return InvalidKeyAlgorithm(fmt.Sprintf("%s", v))
+		return nil
 	}
 }

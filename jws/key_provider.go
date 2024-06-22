@@ -114,7 +114,7 @@ func (kp *keySetProvider) selectKey(sink KeySink, key jwk.Key, sig *Signature, _
 		return nil
 	}
 
-	if v := key.Algorithm(); v.String() != "" {
+	if v := key.Algorithm(); v != nil {
 		var alg jwa.SigningAlgorithm
 		if err := alg.Accept(v); err != nil {
 			return fmt.Errorf(`invalid signing algorithm %s: %w`, key.Algorithm(), err)

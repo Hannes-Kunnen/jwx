@@ -94,7 +94,7 @@ func TestKeyAlgorithmFrom(t *testing.T) {
 		t.Run(fmt.Sprintf("%T", tc.Input), func(t *testing.T) {
 			alg := jwa.KeyAlgorithmFrom(tc.Input)
 			if tc.Error {
-				if !assert.IsType(t, alg, jwa.InvalidKeyAlgorithm(""), `key should be invalid`) {
+				if !assert.IsType(t, alg, nil, `key should be invalid`) {
 					return
 				}
 			} else {
