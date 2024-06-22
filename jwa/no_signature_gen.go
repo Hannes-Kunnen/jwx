@@ -44,5 +44,5 @@ func (v NoSignatureAlgorithm) String() string {
 	return string(v)
 }
 
-// isSignatureAlgorithm is just added so it would qualify as a SignatureAlgorithm.
-func (v NoSignatureAlgorithm) isSignatureAlgorithm() {}
+// signatureAlgorithm is just added so it would qualify as a SignatureAlgorithm.
+func (NoSignatureAlgorithm) signatureAlgorithm() {}

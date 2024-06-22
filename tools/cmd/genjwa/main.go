@@ -571,8 +571,8 @@ endMultiValue:
 	o.L("}")
 
 	if t.name == "SigningAlgorithm" || t.name == "NoSignatureAlgorithm" {
-		o.LL("// isSignatureAlgorithm is just added so it would qualify as a SignatureAlgorithm.")
-		o.L("func (v %s) isSignatureAlgorithm() {}", t.name)
+		o.LL("// signatureAlgorithm is just added so it would qualify as a SignatureAlgorithm.")
+		o.L("func (%s) signatureAlgorithm() {}", t.name)
 	}
 
 	if t.name == "SigningAlgorithm" || t.name == "KeyEncryptionAlgorithm" {

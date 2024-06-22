@@ -13,7 +13,7 @@ import (
 // These are described in https://tools.ietf.org/html/rfc7518#section-3.1.
 type SignatureAlgorithm interface {
 	String() string
-	isSignatureAlgorithm()
+	signatureAlgorithm()
 }
 
 var muSignatureAlgorithms sync.RWMutex

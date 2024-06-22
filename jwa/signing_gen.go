@@ -136,8 +136,8 @@ func (v SigningAlgorithm) String() string {
 	return string(v)
 }
 
-// isSignatureAlgorithm is just added so it would qualify as a SignatureAlgorithm.
-func (v SigningAlgorithm) isSignatureAlgorithm() {}
+// signatureAlgorithm is just added so it would qualify as a SignatureAlgorithm.
+func (SigningAlgorithm) signatureAlgorithm() {}
 
 // IsSymmetric returns true if the algorithm is a symmetric type
 func (v SigningAlgorithm) IsSymmetric() bool {
