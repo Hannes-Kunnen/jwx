@@ -602,7 +602,6 @@ endMultiValue:
 		if cfe, ok := err.(codegen.CodeFormatError); ok {
 			fmt.Fprint(os.Stderr, cfe.Source())
 		}
-		fmt.Printf("Error: %+v\n", err)
 		return fmt.Errorf(`failed to write to %s: %w`, t.filename, err)
 	}
 	return nil
