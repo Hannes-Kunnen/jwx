@@ -134,6 +134,9 @@ func (v KeyEncryptionAlgorithm) String() string {
 	return string(v)
 }
 
+// keyAlgorithm is just added so it would qualify as a KeyAlgorithm.
+func (KeyEncryptionAlgorithm) keyAlgorithm() {}
+
 // IsSymmetric returns true if the algorithm is a symmetric type
 func (v KeyEncryptionAlgorithm) IsSymmetric() bool {
 	switch v {

@@ -19,6 +19,7 @@ import "fmt"
 type KeyAlgorithm interface {
 	String() string
 	IsSymmetric() bool
+	keyAlgorithm()
 }
 
 // InvalidKeyAlgorithm represents an algorithm that the library is not aware of.
@@ -31,6 +32,8 @@ func (s InvalidKeyAlgorithm) String() string {
 func (s InvalidKeyAlgorithm) IsSymmetric() bool {
 	return false
 }
+
+func (InvalidKeyAlgorithm) keyAlgorithm() {}
 
 func (InvalidKeyAlgorithm) Accept(_ interface{}) error {
 	return fmt.Errorf(`jwa.InvalidKeyAlgorithm does not support Accept() method calls`)

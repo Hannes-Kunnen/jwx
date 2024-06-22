@@ -569,6 +569,11 @@ endMultiValue:
 	}
 
 	if t.name == "SigningAlgorithm" || t.name == "KeyEncryptionAlgorithm" {
+		o.LL("// keyAlgorithm is just added so it would qualify as a KeyAlgorithm.")
+		o.L("func (%s) keyAlgorithm() {}", t.name)
+	}
+
+	if t.name == "SigningAlgorithm" || t.name == "KeyEncryptionAlgorithm" {
 		o.LL("// IsSymmetric returns true if the algorithm is a symmetric type")
 		o.L("func (v %s) IsSymmetric() bool {", t.name)
 		o.L("switch v {")
