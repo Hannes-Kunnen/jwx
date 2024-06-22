@@ -463,6 +463,10 @@ func (t typ) Generate() error {
 	o.LL("func init() {")
 	o.L("mu%[1]ss.Lock()", t.name)
 	o.L("defer mu%[1]ss.Unlock()", t.name)
+	if t.name == "SigningAlgorithm" {
+		o.L("mu%[1]ss.Lock()", "SignatureAlgorithm")
+		o.L("defer mu%[1]ss.Unlock()", "SignatureAlgorithm")
+	}
 	o.L("all%[1]ss = make(map[%[1]s]struct{})", t.name)
 	for _, e := range t.elements {
 		if !e.invalid {
@@ -473,9 +477,6 @@ func (t typ) Generate() error {
 	o.L("}")
 
 	o.LL("// Register%[1]s registers a new %[1]s so that the jwx can properly handle the new value.", t.name)
-	if t.name == "SigningAlgorithm" {
-		o.L("// Keep in mind that this is linked to will also add a new %[1]s as these are linked.", "SignatureAlgorithm")
-	}
 	o.L("// Duplicates will silently be ignored")
 	o.L("func Register%[1]s(v %[1]s) {", t.name)
 	o.L("mu%[1]ss.Lock()", t.name)
@@ -487,17 +488,10 @@ func (t typ) Generate() error {
 	o.L("if _, ok := all%[1]ss[v]; !ok {", t.name)
 	o.L("all%[1]ss[v] = struct{}{}", t.name)
 	o.L("rebuild%[1]s()", t.name)
-	if t.name == "SigningAlgorithm" {
-		o.L("all%[1]ss[v] = struct{}{}", "SignatureAlgorithm")
-		o.L("rebuild%[1]s()", "SignatureAlgorithm")
-	}
 	o.L("}")
 	o.L("}")
 
 	o.LL("// Unregister%[1]s unregisters a %[1]s from its known database.", t.name)
-	if t.name == "SigningAlgorithm" {
-		o.L("// Keep in mind that this will also remove the linked %[1]s.", "SignatureAlgorithm")
-	}
 	o.L("// Non-existent entries will silently be ignored")
 	o.L("func Unregister%[1]s(v %[1]s) {", t.name)
 	o.L("mu%[1]ss.Lock()", t.name)
@@ -509,10 +503,6 @@ func (t typ) Generate() error {
 	o.L("if _, ok := all%[1]ss[v]; ok {", t.name)
 	o.L("delete(all%[1]ss, v)", t.name)
 	o.L("rebuild%[1]s()", t.name)
-	if t.name == "SigningAlgorithm" {
-		o.L("delete(all%[1]ss, v)", "SignatureAlgorithm")
-		o.L("rebuild%[1]s()", "SignatureAlgorithm")
-	}
 	o.L("}")
 	o.L("}")
 
@@ -524,6 +514,9 @@ func (t typ) Generate() error {
 	o.L("sort.Slice(list%s, func(i, j int) bool {", t.name)
 	o.L("return string(list%[1]s[i]) < string(list%[1]s[j])", t.name)
 	o.L("})")
+	if t.name == "SigningAlgorithm" {
+		o.L("rebuild%[1]s()", "SignatureAlgorithm")
+	}
 	o.L("}")
 
 	o.LL("// %[1]ss returns a list of all available values for %[1]s", t.name)

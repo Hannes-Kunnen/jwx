@@ -38,6 +38,8 @@ var listSigningAlgorithm []SigningAlgorithm
 func init() {
 	muSigningAlgorithms.Lock()
 	defer muSigningAlgorithms.Unlock()
+	muSignatureAlgorithms.Lock()
+	defer muSignatureAlgorithms.Unlock()
 	allSigningAlgorithms = make(map[SigningAlgorithm]struct{})
 	allSigningAlgorithms[ES256] = struct{}{}
 	allSigningAlgorithms[ES256K] = struct{}{}
@@ -57,7 +59,6 @@ func init() {
 }
 
 // RegisterSigningAlgorithm registers a new SigningAlgorithm so that the jwx can properly handle the new value.
-// Keep in mind that this is linked to will also add a new SignatureAlgorithm as these are linked.
 // Duplicates will silently be ignored
 func RegisterSigningAlgorithm(v SigningAlgorithm) {
 	muSigningAlgorithms.Lock()
@@ -67,13 +68,10 @@ func RegisterSigningAlgorithm(v SigningAlgorithm) {
 	if _, ok := allSigningAlgorithms[v]; !ok {
 		allSigningAlgorithms[v] = struct{}{}
 		rebuildSigningAlgorithm()
-		allSignatureAlgorithms[v] = struct{}{}
-		rebuildSignatureAlgorithm()
 	}
 }
 
 // UnregisterSigningAlgorithm unregisters a SigningAlgorithm from its known database.
-// Keep in mind that this will also remove the linked SignatureAlgorithm.
 // Non-existent entries will silently be ignored
 func UnregisterSigningAlgorithm(v SigningAlgorithm) {
 	muSigningAlgorithms.Lock()
@@ -83,8 +81,6 @@ func UnregisterSigningAlgorithm(v SigningAlgorithm) {
 	if _, ok := allSigningAlgorithms[v]; ok {
 		delete(allSigningAlgorithms, v)
 		rebuildSigningAlgorithm()
-		delete(allSignatureAlgorithms, v)
-		rebuildSignatureAlgorithm()
 	}
 }
 
@@ -96,6 +92,7 @@ func rebuildSigningAlgorithm() {
 	sort.Slice(listSigningAlgorithm, func(i, j int) bool {
 		return string(listSigningAlgorithm[i]) < string(listSigningAlgorithm[j])
 	})
+	rebuildSignatureAlgorithm()
 }
 
 // SigningAlgorithms returns a list of all available values for SigningAlgorithm
