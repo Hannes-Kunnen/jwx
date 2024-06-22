@@ -58,7 +58,7 @@ func SignatureAlgorithms() []SignatureAlgorithm {
 	return listSignatureAlgorithm
 }
 
-func SignatureAlgorithmAccept(value interface{}) (SignatureAlgorithm, error) {
+func AcceptSignatureAlgorithm(value interface{}) (SignatureAlgorithm, error) {
 	var signatureAlg SignatureAlgorithm
 	if x, ok := value.(SignatureAlgorithm); ok {
 		signatureAlg = x

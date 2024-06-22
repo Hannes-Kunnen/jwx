@@ -333,7 +333,7 @@ func (h *stdHeaders) Set(name string, value interface{}) error {
 func (h *stdHeaders) setNoLock(name string, value interface{}) error {
 	switch name {
 	case AlgorithmKey:
-		acceptor, err := jwa.SignatureAlgorithmAccept(value)
+		acceptor, err := jwa.AcceptSignatureAlgorithm(value)
 		if err != nil {
 			return fmt.Errorf(`invalid value for %s key: %w`, AlgorithmKey, err)
 		}
