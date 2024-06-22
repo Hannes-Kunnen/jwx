@@ -453,7 +453,7 @@ func (t typ) Generate() error {
 		goto endMultiValue
 	}
 
-	// Registers and related tools are provided so users can register their own types.
+	// Register%s and related tools are provided so users can register their own types.
 	// This triggers some re-building of data structures that are otherwise
 	// reused for efficiency
 	o.LL("var mu%[1]ss sync.RWMutex", t.name)
@@ -492,7 +492,7 @@ func (t typ) Generate() error {
 	o.L("}")
 
 	o.LL("// Unregister%[1]s unregisters a %[1]s from its known database.", t.name)
-	o.L("// Non-existent entries will silently be ignored")
+	o.L("// Non-existentn entries will silently be ignored")
 	o.L("func Unregister%[1]s(v %[1]s) {", t.name)
 	o.L("mu%[1]ss.Lock()", t.name)
 	o.L("defer mu%[1]ss.Unlock()", t.name)

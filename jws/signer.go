@@ -28,8 +28,8 @@ var signerDB map[jwa.SigningAlgorithm]SignerFactory
 // (probably in your `init()`)
 //
 // Unlike the `UnregisterSigner` function, this function automatically
-// calls `jwa.RegisterSigningAlgorithm` to register the algorithm
-// in the known-algorithms database.
+// calls `jwa.RegisterSignatureAlgorithm` to register the algorithm
+// in the known algorithms database.
 func RegisterSigner(alg jwa.SigningAlgorithm, f SignerFactory) {
 	jwa.RegisterSigningAlgorithm(alg)
 	muSignerDB.Lock()
@@ -49,7 +49,7 @@ func RegisterSigner(alg jwa.SigningAlgorithm, f SignerFactory) {
 // This is because the algorithm may still be required for verification or
 // some other operation (however unlikely, it is still possible).
 // Therefore, in order to completely remove the algorithm, you must
-// call `jwa.UnregisterSigningAlgorithm` yourself.
+// call `jwa.UnregisterSignatureAlgorithm` yourself.
 func UnregisterSigner(alg jwa.SigningAlgorithm) {
 	muSignerDB.Lock()
 	delete(signerDB, alg)
@@ -90,7 +90,7 @@ func init() {
 	}))
 }
 
-// NewSigner creates a signer that signs payloads using the given signing algorithm.
+// NewSigner creates a signer that signs payloads using the given signature algorithm.
 func NewSigner(alg jwa.SigningAlgorithm) (Signer, error) {
 	muSignerDB.RLock()
 	f, ok := signerDB[alg]
@@ -99,7 +99,7 @@ func NewSigner(alg jwa.SigningAlgorithm) (Signer, error) {
 	if ok {
 		return f.Create()
 	}
-	return nil, fmt.Errorf(`unsupported signing algorithm "%s"`, alg)
+	return nil, fmt.Errorf(`unsupported signature algorithm "%s"`, alg)
 }
 
 type noneSigner struct{}

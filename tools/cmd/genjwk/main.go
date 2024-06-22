@@ -693,13 +693,12 @@ func generateGenericHeaders(fields codegen.FieldList) error {
 	o.LL("// KeyType returns the `kty` of a JWK")
 	o.L("KeyType() jwa.KeyType")
 	for _, f := range fields {
+		o.L("// %s returns `%s` of a JWK", f.GetterMethod(true), f.JSON())
 		if f.Name(false) == "algorithm" {
-			o.L("// Algorithm returns the value of the `alg` field")
+			o.LL("// Algorithm returns the value of the `alg` field")
 			o.L("//")
-			o.L("// This field may contain either `jwa.SigningAlgorithm` or `jwa.KeyEncryptionAlgorithm`.")
-			o.L("// This is why there exists a `jwa.KeyAlgorithm` type that encompasses both types.")
-		} else {
-			o.L("// %s returns `%s` of a JWK", f.GetterMethod(true), f.JSON())
+			o.L("// This field may contain either `jwk.SignatureAlgorithm` or `jwk.KeyEncryptionAlgorithm`.")
+			o.L("// This is why there exists a `jwa.KeyAlgorithm` type that encompases both types.")
 		}
 		o.L("%s() ", f.GetterMethod(true))
 		if v := f.String(`getter_return_value`); v != "" {

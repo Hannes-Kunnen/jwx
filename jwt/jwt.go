@@ -404,7 +404,7 @@ OUTER:
 // the type of key you provided, otherwise an error is returned.
 // For convenience `alg` is of type jwa.KeyAlgorithm so you can pass
 // the return value of `(jwk.Key).Algorithm()` directly, but in practice
-// it must be an instance of jwa.SigningAlgorithm, otherwise an error
+// it must be an instance of jwa.SignatureAlgorithm, otherwise an error
 // is returned.
 //
 // The protected header will also automatically have the `typ` field set

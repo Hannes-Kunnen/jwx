@@ -34,7 +34,7 @@ import (
 //
 // Then, remember that a JWE message may contain multiple recipients in the
 // message. For each recipient, we call on the KeyProviders to give us
-// the key(s) to use to decrypt the CEK:
+// the key(s) to use on this signature:
 //
 //	for r in msg.Recipients {
 //	  for kp in keyProviders {
@@ -56,7 +56,7 @@ import (
 //
 //	sink.Key(alg, key)
 //
-// These keys are then retrieved and tried for each recipient, until
+// These keys are then retrieved and tried for each signature, until
 // a match is found:
 //
 //	keys := sink.Keys()

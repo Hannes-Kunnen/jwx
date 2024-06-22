@@ -11,7 +11,7 @@
 //
 // To sign, simply use `jws.Sign`. `payload` is a []byte buffer that
 // contains whatever data you want to sign. `alg` is one of the
-// jwa.SigningAlgorithm constants from package jwa. For RSA and
+// jwa.SignatureAlgorithm constants from package jwa. For RSA and
 // ECDSA family of algorithms, you will need to prepare a private key.
 // For HMAC family, you just need a []byte value. The `jws.Sign`
 // function will return the encoded JWS message on success.
@@ -186,7 +186,7 @@ func Sign(payload []byte, options ...SignOption) ([]byte, error) {
 
 			alg, ok := data.alg.(jwa.SigningAlgorithm)
 			if !ok {
-				return nil, fmt.Errorf(`jws.Sign: expected algorithm to be of type jwa.SigningAlgorithm but got (%[1]q, %[1]T)`, data.alg)
+				return nil, fmt.Errorf(`jws.Sign: expected algorithm to be of type jwa.SignatureAlgorithm but got (%[1]q, %[1]T)`, data.alg)
 			}
 
 			signer, err := makeSigner(alg, data.key, data.public, data.protected)
@@ -304,8 +304,8 @@ var allowNoneWhitelist = jwk.WhitelistFunc(func(string) bool {
 //
 // Because the use of "none" (jwa.NoSignature) algorithm is strongly discouraged,
 // this function DOES NOT consider it a success when `{"alg":"none"}` is
-// encountered in the message (it would also be counterintuitive when the code says
-// it _verified_ something when in fact it did no such thing). If you want to
+// encountered in the message (it would also be counter intuitive when the code says
+// you _verified_ something when in fact it did no such thing). If you want to
 // accept messages with "none" signature algorithm, use `jws.Parse` to get the
 // raw JWS message.
 func Verify(buf []byte, options ...VerifyOption) ([]byte, error) {
@@ -412,7 +412,7 @@ func Verify(buf []byte, options ...VerifyOption) ([]byte, error) {
 			for _, pair := range sink.list {
 				// alg is converted here because pair.alg is of type jwa.KeyAlgorithm.
 				// this may seem ugly, but we're trying to avoid declaring separate
-				// structs for `alg jwa.KeyEncryptionAlgorithm` and `alg jwa.SigningAlgorithm`
+				// structs for `alg jwa.KeyAlgorithm` and `alg jwa.SignatureAlgorithm`
 				//nolint:forcetypeassert
 				alg := pair.alg.(jwa.SigningAlgorithm)
 				key := pair.key

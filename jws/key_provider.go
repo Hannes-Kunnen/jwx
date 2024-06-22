@@ -254,7 +254,7 @@ func (kp jkuProvider) FetchKeys(ctx context.Context, sink KeySink, sig *Signatur
 
 	hdrAlg := sig.ProtectedHeaders().Algorithm()
 	for _, alg := range algs {
-		// if we have an "alg" field in the JWS, we can only proceed if
+		// if we have a "alg" field in the JWS, we can only proceed if
 		// the inferred algorithm matches
 		if hdrAlg != nil && hdrAlg != alg {
 			continue

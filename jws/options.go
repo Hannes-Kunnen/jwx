@@ -55,14 +55,14 @@ func (w *withKey) Protected(v Headers) Headers {
 // WithKey is used to pass a static algorithm/key pair to either `jws.Sign()` or `jws.Verify()`.
 //
 // The `alg` parameter is the identifier for the signature algorithm that should be used.
-// It is of type `jwa.KeyAlgorithm` but in reality you can only pass `jwa.SigningAlgorithm`
+// It is of type `jwa.KeyAlgorithm` but in reality you can only pass `jwa.SignatureAlgorithm`
 // types. It is this way so that the value in `(jwk.Key).Algorithm()` can be directly
-// passed to the option. If you specify other algorithm types such as `jwa.KeyEncryptionAlgorithm`,
+// passed to the option. If you specify other algorithm types such as `jwa.ContentEncryptionAlgorithm`,
 // then you will get an error when `jws.Sign()` or `jws.Verify()` is executed.
 //
 // The `alg` parameter cannot be "none" (jwa.NoSignature) for security reasons.
-// You will have to use a separate, more explicit option (WithInsecureNoSignature) to allow the use
-// of the "none" algorithm.
+// You will have to use a separate, more explicit option to allow the use of "none"
+// algorithm.
 //
 // The algorithm specified in the `alg` parameter MUST be able to support
 // the type of key you provided, otherwise an error is returned.
@@ -202,7 +202,8 @@ func (w *withInsecureNoSignature) Protected(v Headers) Headers {
 //
 // Please note that this is insecure, and should never be used in production
 // (this is exactly why specifying "none"/jwa.NoSignature to `jws.WithKey()`
-// is not possible -- we do not allow using "none" by accident)
+// results in an error when `jws.Sign()` is called -- we do not allow using
+// "none" by accident)
 //
 // TODO: create specific sub-option set for this option
 func WithInsecureNoSignature(options ...WithKeySuboption) SignOption {

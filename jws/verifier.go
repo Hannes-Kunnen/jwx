@@ -27,8 +27,8 @@ var verifierDB map[jwa.SigningAlgorithm]VerifierFactory
 // (probably in your `init()`)
 //
 // Unlike the `UnregisterVerifier` function, this function automatically
-// calls `jwa.RegisterSigningAlgorithm` to register the algorithm
-// in the known-algorithms database.
+// calls `jwa.RegisterSignatureAlgorithm` to register the algorithm
+// in the known algorithms database.
 func RegisterVerifier(alg jwa.SigningAlgorithm, f VerifierFactory) {
 	jwa.RegisterSigningAlgorithm(alg)
 	muVerifierDB.Lock()
@@ -44,7 +44,7 @@ func RegisterVerifier(alg jwa.SigningAlgorithm, f VerifierFactory) {
 // This is because the algorithm may still be required for signing or
 // some other operation (however unlikely, it is still possible).
 // Therefore, in order to completely remove the algorithm, you must
-// call `jwa.UnregisterSigningAlgorithm` yourself.
+// call `jwa.UnregisterSignatureAlgorithm` yourself.
 func UnregisterVerifier(alg jwa.SigningAlgorithm) {
 	muVerifierDB.Lock()
 	delete(verifierDB, alg)
@@ -92,5 +92,5 @@ func NewVerifier(alg jwa.SigningAlgorithm) (Verifier, error) {
 	if ok {
 		return f.Create()
 	}
-	return nil, fmt.Errorf(`unsupported signing algorithm "%s"`, alg)
+	return nil, fmt.Errorf(`unsupported signature algorithm "%s"`, alg)
 }

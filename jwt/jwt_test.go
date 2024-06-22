@@ -650,7 +650,7 @@ func TestSignErrors(t *testing.T) {
 		return
 	}
 
-	if !assert.Contains(t, err.Error(), `unsupported signing algorithm "BOGUS"`) {
+	if !assert.Contains(t, err.Error(), `unsupported signature algorithm "BOGUS"`) {
 		return
 	}
 
