@@ -17,14 +17,26 @@ import "fmt"
 // type-check at compile time, but this allows users to pass a value from a
 // jwk.Key directly
 type KeyAlgorithm interface {
+	keyAlgorithm()
 	String() string
+	// IsSymmetric returns true if the algorithm is a symmetric type.
+	// Algorithms registered using the register functions will always return false, these should be
+	// checked separately. Keep in mind that the NoSignature algorithm and the InvalidKeyAlgorithm
+	// type will always return false as these do not indicate symmetry.
+	IsSymmetric() bool
 }
 
 // InvalidKeyAlgorithm represents an algorithm that the library is not aware of.
 type InvalidKeyAlgorithm string
 
+func (InvalidKeyAlgorithm) keyAlgorithm() {}
+
 func (s InvalidKeyAlgorithm) String() string {
 	return string(s)
+}
+
+func (InvalidKeyAlgorithm) IsSymmetric() bool {
+	return false
 }
 
 func (InvalidKeyAlgorithm) Accept(_ interface{}) error {

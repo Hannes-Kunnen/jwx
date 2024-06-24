@@ -136,3 +136,6 @@ func (v SignatureAlgorithm) IsSymmetric() bool {
 	}
 	return false
 }
+
+// keyAlgorithm is used to qualify as a KeyAlgorithm.
+func (SignatureAlgorithm) keyAlgorithm() {}

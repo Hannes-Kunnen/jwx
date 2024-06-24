@@ -143,3 +143,6 @@ func (v KeyEncryptionAlgorithm) IsSymmetric() bool {
 	}
 	return false
 }
+
+// keyAlgorithm is used to qualify as a KeyAlgorithm.
+func (KeyEncryptionAlgorithm) keyAlgorithm() {}

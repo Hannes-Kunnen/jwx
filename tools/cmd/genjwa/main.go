@@ -528,6 +528,9 @@ func (t typ) Generate() error {
 		o.L("}")
 		o.L("return false")
 		o.L("}")
+
+		o.LL("// keyAlgorithm is used to qualify as a KeyAlgorithm.")
+		o.L("func (%s) keyAlgorithm() {}", t.name)
 	}
 
 	if err := o.WriteFile(t.filename, codegen.WithFormatCode(true)); err != nil {
